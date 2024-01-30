@@ -1,2 +1,3 @@
-# ProjectTemplate
-copy this code into your own repository, and use it for your project as you see fit!
+# Scrum Devils Suggestion Manager
+
+Scrum Devils Suggestion Manager is an application designed to enhance employee satisfaction.
