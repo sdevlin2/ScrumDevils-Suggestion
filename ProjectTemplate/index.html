@@ -1,61 +1,138 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8" />
-	<title></title>
-	<!--DO NOT FORGET THIS SCRIPT TAG SO YOU CAN USE JQUERY!!!!!-->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+    <style>
 
-	<!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
-	<script type="text/javascript">
-		function TestButtonHandler() {
+        /* CSS */
 
-			// get my values!
-			userCountValue = document.getElementById("userCountInput").value;
-
-			var webMethod = "ProjectServices.asmx/getBries";
-			var parameters = "{\"userCount\":\"" + encodeURI(userCountValue) + "\"}";
-
-			//jQuery ajax method
-			$.ajax({
-				type: "POST",
-				url: webMethod,
-				data: parameters,
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-				success: function (msg) {
-					var responseFromServer = msg.d;
-
-					for (var i = 0; i < responseFromServer.length; i++) {
-					alert(responseFromServer[i].firstName);
-					alert(responseFromServer[i].lastName);
-                    alert(responseFromServer[i].phoneNumber);
-                    }
-
-					doThisAfterServerStuff();
-
-				},
-				error: function (e) {
-					alert("this code will only execute if javascript is unable to access the webservice");
-				}
-			});
-		}
-
-		function doThisAfterServerStuff() {
-            alert("you thought this would execute after the code in my success function, didn't you!?");
-
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-	</script>
-	<!--END OF YOUR OWN JAVASCRIPT-->
 
-	<!--AND YOUR OWN CSS CAN GO HERE AS WELL-->
-	<style>
+        .login-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
 
-	</style>
-	<!--END OF YOUR OWN CSS-->
-</head >
+            .login-container h2 {
+                text-align: center;
+            }
+
+            .login-container input {
+                width: 100%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            .login-container button {
+                width: 100%;
+                padding: 10px;
+                background-color: #0056b3;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+                .login-container button:hover {
+                    background-color: #004494;
+                }
+
+        #loginMessage {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+
+    <!-- JS-->
+
+    <script type="text/javascript">
+        function TestButtonHandler() {
+            var userCountValue = document.getElementById("userCountInput").value;
+            var webMethod = "ProjectServices.asmx/getBries";
+            var parameters = "{\"userCount\":\"" + encodeURI(userCountValue) + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    var responseFromServer = msg.d;
+                    for (var i = 0; i < responseFromServer.length; i++) {
+                        alert(responseFromServer[i].firstName);
+                        alert(responseFromServer[i].lastName);
+                        alert(responseFromServer[i].phoneNumber);
+                    }
+                    doThisAfterServerStuff();
+                },
+                error: function (e) {
+                    alert("this code will only execute if JavaScript is unable to access the web service");
+                }
+            });
+
+            function doThisAfterServerStuff() {
+                alert("you thought this would execute after the code in my success function, didn't you!?");
+            }
+        }
+
+        function logon() {
+            var id = document.getElementById("logonID").value;
+            var pass = document.getElementById("logonPass").value;
+            var webMethod = "ProjectServices.asmx/LogOn";
+            var parameters = "{\"uid\":\"" + encodeURI(id) + "\", \"pass\":\"" + encodeURI(pass) + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    var responseFromServer = msg.d;
+                    if (responseFromServer == true) {
+                        alert("Logged in!");
+                    } else {
+                        alert("Bad credentials");
+                    }
+                },
+                error: function (e) {
+                    alert("this code will only execute if javascript is unable to access the webservice");
+                }
+            });
+        }
+    </script>
+</head>
 <body>
-    <!-- <button onclick="javascript: TestButtonHandler();">Click here to test connection!</button>-->
-	<input id="userCountInput" type="text" /> <button onclick="javascript: TestButtonHandler();">Click here to test connection!</button>
+
+
+    <!-- HTML -->
+
+    <div class="login-container">
+        <h2>Login</h2>
+        <input type="text" id="logonID" placeholder="Username" />
+        <input type="password" id="logonPass" placeholder="Password" />
+        <button onclick="logon();">Log In</button>
+        <div id="loginMessage"></div>
+    </div>
 </body>
-</html >
+</html>

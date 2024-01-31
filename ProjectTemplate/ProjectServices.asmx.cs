@@ -19,9 +19,9 @@ namespace ProjectTemplate
 		////////////////////////////////////////////////////////////////////////
 		///replace the values of these variables with your database credentials
 		////////////////////////////////////////////////////////////////////////
-		private string dbID = "cis440template";
-		private string dbPass = "!!Cis440";
-		private string dbName = "cis440template";
+		private string dbID = "spring2024team4";
+		private string dbPass = "spring2024team4";
+		private string dbName = "spring2024team4";
 		////////////////////////////////////////////////////////////////////////
 		
 		////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ namespace ProjectTemplate
 		{
 			try
 			{
-				string testQuery = "select * from test";
+				string testQuery = "select * from Users";
 
 				////////////////////////////////////////////////////////////////////////
 				///here's an example of using the getConString method!
@@ -63,7 +63,54 @@ namespace ProjectTemplate
 			}
 		}
 
-		[WebMethod]
+		//LOG ON METHOD
+        [WebMethod]
+        public bool LogOn(string uid, string pass)
+        {
+            //LOGIC: pass the parameters into the database to see if an account
+            //with these credentials exist.  If it does, then return true.  If
+            //it doesn't, then return false
+
+            //we return this flag to tell them if they logged in or not
+            bool success = false;
+
+            //our connection string comes from our web.config file like we talked about earlier
+            string sqlConnectString = getConString();
+            //here's our query.  A basic select with nothing fancy.  Note the parameters that begin with @
+            string sqlSelect = "SELECT id FROM Users WHERE userid=@idValue and pass=@passValue";
+
+            //set up our connection object to be ready to use our connection string
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            //set up our command object to use our connection, and our query
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            //tell our command to replace the @parameters with real values
+            //we decode them because they came to us via the web so they were encoded
+            //for transmission (funky characters escaped, mostly)
+            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(uid));
+            sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
+
+            //a data adapter acts like a bridge between our command object and 
+            //the data we are trying to get back and put in a table object
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            //here's the table we want to fill with the results from our query
+            DataTable sqlDt = new DataTable();
+            //here we go filling it!
+            sqlDa.Fill(sqlDt);
+            //check to see if any rows were returned.  If they were, it means it's 
+            //a legit account
+            if (sqlDt.Rows.Count > 0)
+            {
+				//flip our flag to true so we return a value that lets them know they're logged in
+                success = true;
+            }
+            //return the result!
+            return success;
+        }
+
+
+
+        [WebMethod]
 		public Person[] getBries(int userCount)
         {
 			List<Person> people = new List<Person>();
