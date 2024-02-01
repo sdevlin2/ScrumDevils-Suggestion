@@ -43,6 +43,7 @@ namespace ProjectTemplate
 		{
 			try
 			{
+
 				string testQuery = "select * from Users";
 
 				////////////////////////////////////////////////////////////////////////
