@@ -17,8 +17,11 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
+            width: 100vw;
+            margin: 0px;
+            position:relative;
         }
+
 
         .login-container {
             background-color: white;
@@ -27,6 +30,7 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             width: 100%;
             max-width: 400px;
+            
         }
 
             .login-container h2 {
@@ -60,11 +64,89 @@
             text-align: center;
             margin-top: 10px;
         }
+
+
+        /*New CSS for main content page*/
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+
+
+        .mainPage {
+           
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            visibility: hidden;
+            right:  0px;
+            bottom: 0px;
+        }
+           
+        .content button {
+                width: 200px;
+                padding: 20px;
+                margin: 10px;
+                font-size: 24px;
+                cursor: pointer;
+         }
+
+            .content .buttons {
+                text-align: center;
+            }
+
+            .content img {
+                height: 35vh;
+            }
+
+            #header {
+                background-color: blue;
+                padding: 20px;
+            }
+
+
+            .profile-icon {
+                width: 60px;
+                height: 60px;
+                background-color: #ddd;
+                border-radius: 50%;
+                margin-right: 10px;
+            }
+
+
     </style>
 
     <!-- JS-->
 
     <script type="text/javascript">
+
+        var contentPanels = ['logonPanel', 'suggestionPage', 'accountsPanel', 'leaderBoardPage', 'matchingPage', 'login-container'];
+        //this function toggles which panel is showing, and also clears data from all panels
+        function showPanel(panelId) {
+            
+            for (var i = 0; i < contentPanels.length; i++) {
+                if (panelId == contentPanels[i]) {
+                    $("#" + contentPanels[i]).css("visibility", "visible");
+                }
+                else {
+                    $("#" + contentPanels[i]).css("visibility", "hidden");
+                }
+            }
+        }
+
+ 
+
+        jQuery(function () {
+            //when the app loads, show the logon panel to start with!
+            showPanel('logonPanel');
+        });
+
+
         function TestButtonHandler() {
             var userCountValue = document.getElementById("userCountInput").value;
             var webMethod = "ProjectServices.asmx/getBries";
@@ -108,9 +190,11 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (msg) {
+                    
                     var responseFromServer = msg.d;
                     if (responseFromServer == true) {
-                        alert("Logged in!");
+                        
+                        showPanel('accountsPanel');   //When user logins with correct credentials it will take them to main content page
                     } else {
                         alert("Bad credentials");
                     }
@@ -120,19 +204,76 @@
                 }
             });
         }
+
+        //each button selected will take them to designated page
+        function leaderBoard() {
+            showPanel('leaderBoardPage');
+        }
+
+        function match() {
+            showPanel('matchingPage');
+        }
+
+        function suggestionInput() {
+            showPanel('suggestionPage');
+        }
+
+       // Allows the user to go back to main content page
+        function goBack() {
+            showPanel('accountsPanel');
+        }
     </script>
 </head>
 <body>
 
 
     <!-- HTML -->
+    <div class="contentContainer">
+        <div id="logonPanel" class="login-container">
 
-    <div class="login-container">
-        <h2>Login</h2>
-        <input type="text" id="logonID" placeholder="Username" />
-        <input type="password" id="logonPass" placeholder="Password" />
-        <button onclick="logon();">Log In</button>
-        <div id="loginMessage"></div>
+            <h2>Login</h2>
+            <input type="text" id="logonID" placeholder="Username" />
+            <input type="password" id="logonPass" placeholder="Password" />
+            <button onclick="logon();">Log In</button>
+            <div id="loginMessage"></div>
+
+        </div>
+
+        <div id="accountsPanel" class="mainPage">
+                
+                    <div id="header" class="header">
+                        <div class="profile-icon"></div>
+                    </div>
+                
+                <div class="content">
+                    <img src="logo-color.jpg" alt="User Profile">
+                    
+                    <button onclick="leaderBoard()" id="lbButton">Leaderboard</button>
+                    <button onclick="match()" id="mButton">Matching</button>
+                    <button onclick="suggestionInput()" id="sButton">Suggestions</button>
+                </div>          
+        </div>
+
+        
+        <div class="mainPage">
+            <div id="leaderBoardPage">
+                <h1>Leader Board</h1>
+                <p></p>
+                <a href="#" onclick="goBack()">Go Back</a>
+            </div>
+            <div id="matchingPage">
+                <h1>Look who you matched with!</h1>
+                <p></p>
+                <a href="#" onclick="goBack()">Go Back</a>
+            </div>
+            <div id="suggestionPage">
+                <h1>Make a suggestion</h1>
+                <p></p>
+                <a href="#" onclick="goBack()">Go Back</a>
+            </div>
+        
+        </div>
+   
     </div>
 </body>
 </html>
