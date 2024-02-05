@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Feedback</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+    <style>
+
+        /* CSS */
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .feedback-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            height: 75vh;
+            max-height: 800px;
+        }
+
+            .feedback-container textarea {
+
+                width: 100%;
+                height: 50vh;
+            }
+
+            .feedback-container h2 {
+                text-align: center;
+            }
+
+            .feedback-container input {
+                width: 100%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            .feedback-container input {
+                width: 100%;
+                padding: 10px;
+                background-color: #0056b3;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+                .feedback-container input:hover {
+                    background-color: #004494;
+                }
+
+        #topic{
+            font-size: 200%;
+        }
+
+        #question{
+            font-size: 150%;
+        }
+
+        #loginMessage {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        window.onload = function topic_question_load() {
+
+            /*will replace the topic and question placeholders with questions from db
+            document.getElementById('topic').innerHTML = '';
+            document.getElementById('question').innerHTML = '';*/
+            //alert('The Questions will Change Upon Loading Page')
+        }
+
+        function submit_feedback() {
+            var feedback = document.getElementById('feedbackValue').value;
+            alert(feedback);
+        }
+
+    </script>
+
+</head>
+<body>
+
+    <form><!--what does it do when submitted? action-->
+        <div class="feedback-container">
+            <h2 id="topic">Placeholder Topic</h2>
+            <h2 id="question">Placeholder Question</h2>
+            <br /><br />
+            <textarea id="feedbackValue"></textarea>
+            <input type="submit" onclick ="submit_feedback()" value="Submit Feedback">
+        </div>
+        
+    </form>
+    
+
+</body>
+</html>
