@@ -110,6 +110,52 @@ namespace ProjectTemplate
         }
 
 
+        [WebMethod]
+        public string IncrementSwipes(string userid)
+        {
+            //This method increments the swipes value in the MySQL DB
+
+            try
+            {
+                // SQL UPDATE command to increment swipes value
+                string sqlUpdate = "UPDATE Users SET swipes = swipes + 1 WHERE userid = @userid";
+
+                using (MySqlConnection con = new MySqlConnection(getConString()))
+                {
+                    // Open connection
+                    con.Open();
+
+                    // Set up command with the SQL statement and connection
+                    using (MySqlCommand cmd = new MySqlCommand(sqlUpdate, con))
+                    {
+                        // Add the userid parameter to the command
+                        cmd.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                        // Check if any rows were updated
+                        if (rowsAffected > 0)
+                        {
+                            return "Swipes incremented successfully for userid: " + userid;
+                        }
+                        else
+                        {
+                            return "Userid not found or swipes already at maximum.";
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // Return a message indicating the error
+                return "An error occurred: " + e.Message;
+            }
+        }
+
+
+        //
+
+
 
         [WebMethod]
 		public Person[] getBries(int userCount)
