@@ -205,10 +205,12 @@
                         showPanel('accountsPanel');   //When user logins with correct credentials it will take them to main content page
                     } else {
                         alert("Bad credentials");
+                        
                     }
                 },
                 error: function (e) {
                     alert("this code will only execute if javascript is unable to access the webservice");
+                    window.location.href = "feedback.html";
                 }
             });
         }
