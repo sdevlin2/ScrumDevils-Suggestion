@@ -113,7 +113,7 @@ namespace ProjectTemplate
         [WebMethod]
         public string IncrementSwipes(string userid)
         {
-            //This method increments the swipes value in the MySQL DB
+            //This method increments the swipes value in the MySQL DB. Method should be invoked when a user makes a "yes" swipe.
 
             try
             {
@@ -153,9 +153,44 @@ namespace ProjectTemplate
         }
 
 
-        //
+        // GetSwipes method returns a user's daily swipes as an integer. Returns -1 if error is encountered.
 
+        [WebMethod]
+        public int GetSwipes(string userid)
+        {
+            try
+            {
+                // SQL SELECT
+                string sqlSelect = "SELECT swipes FROM Users WHERE userid = @userid";
 
+                using (MySqlConnection con = new MySqlConnection(getConString()))
+                {
+                    con.Open();
+
+                    using (MySqlCommand cmd = new MySqlCommand(sqlSelect, con))
+                    {
+                        cmd.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+
+                        object result = cmd.ExecuteScalar();
+
+                        // If result is not null, convert and return the swipes value as integer
+                        if (result != null)
+                        {
+                            return Convert.ToInt32(result);
+                        }
+                        else
+                        {
+                            // Userid not found
+                            return -1;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+        }
 
         [WebMethod]
 		public Person[] getBries(int userCount)
