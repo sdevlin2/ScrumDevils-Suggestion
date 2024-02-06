@@ -1,6 +1,6 @@
 # WorkPulse
 
-![WorkPulse Logo](workpulse.png)
+![WorkPulse Logo](Workpulse.png)
 
 WorkPulse is a pioneering application aimed at revolutionizing employee feedback mechanisms within organizations. WorkPulse offers a unique and engaging platform for employees to anonymously submit and evaluate suggestions for improving their workplace. This novel approach facilitates a more dynamic and participative form of feedback, moving beyond the constraints of traditional surveys to foster a culture of open communication and innovation.
 
