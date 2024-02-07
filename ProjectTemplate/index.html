@@ -306,6 +306,13 @@
             showPanel('accountsPanel');
         }
 
+        // Call logon function when Enter key is pressed
+        function handleEnterKey(event) {
+            if (event.keyCode === 13) { //Enter key
+                logon(); // Call the logon function
+            }
+        }
+
         /* test function for incrementSwipes follows 
         function incrementSwipes() {
             var userid = "Steven"; // Hardcoded for testing, can make dynamic when implemented
@@ -410,3 +417,11 @@
 
 </body>
 </html>
+<script type="text/javascript">
+
+    // Event listeners for user and password fields
+
+    document.getElementById('logonID').addEventListener('keyup', handleEnterKey);
+    document.getElementById('logonPass').addEventListener('keyup', handleEnterKey);
+
+</script>
