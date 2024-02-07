@@ -254,10 +254,12 @@
                         showPanel('accountsPanel');   //When user logins with correct credentials it will take them to main content page
                     } else {
                         alert("Bad credentials");
+                        
                     }
                 },
                 error: function (e) {
                     alert("this code will only execute if javascript is unable to access the webservice");
+                    window.location.href = "feedback.html";
                 }
             });
         }
@@ -302,6 +304,28 @@
         function goBack() {
             showPanel('accountsPanel');
         }
+
+        /* test function for incrementSwipes follows 
+        function incrementSwipes() {
+            var userid = "Steven"; // Hardcoded for testing, can make dynamic when implemented
+            var webMethod = "ProjectServices.asmx/IncrementSwipes";
+            var parameters = "{\"userid\":\"" + encodeURI(userid) + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    alert("Swipes incremented successfully.");
+                },
+                error: function (e) {
+                    alert("Error: Unable to increment swipes.");
+                }
+            });
+        }
+        */
     </script>
 </head>
 <body>
@@ -328,13 +352,17 @@
                         <div class="profile-icon"></div>
                     </div>
                 
-                <div class="content">
-                    <img src="logo-color.jpg" alt="User Profile">
-                    
-                    <button onclick="leaderBoard()" id="lbButton">Leaderboard</button>
-                    <button onclick="match()" id="mButton">Matching</button>
-                    <button onclick="suggestionInput()" id="sButton">Suggestions</button>
-                </div>          
+                    <div class="content">
+                        <img src="logo-color.jpg" alt="User Profile">
+
+                        <button onclick="leaderBoard()" id="lbButton">Leaderboard</button>
+                        <button onclick="match()" id="mButton">Matching</button>
+                        <button onclick="suggestionInput()" id="sButton">Suggestions</button>
+
+                        <!-- Test button for testing functions follows
+                        <button onclick="incrementSwipes()" id="incrementSwipesButton">Test</button>
+                            -->
+                    </div>          
         </div>
 
         
@@ -354,7 +382,7 @@
                 <p></p>
                 <a href="#" onclick="goBack()">Go Back</a>
             </div>
-        
+
         </div>
 
         <div class="mainPage">
