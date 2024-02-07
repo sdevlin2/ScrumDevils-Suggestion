@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,16 +32,15 @@
         }
 
             .feedback-container textarea {
-
                 width: 100%;
                 height: 50vh;
             }
 
-            .feedback-container h2 {
+            .feedback-container h1 {
                 text-align: center;
             }
 
-            .feedback-container input {
+            .feedback-container select, .feedback-container textarea, .feedback-container input {
                 width: 100%;
                 padding: 10px;
                 margin: 10px 0;
@@ -50,9 +49,7 @@
                 box-sizing: border-box;
             }
 
-            .feedback-container input {
-                width: 100%;
-                padding: 10px;
+            .feedback-container input[type="submit"] {
                 background-color: #0056b3;
                 color: white;
                 border: none;
@@ -60,9 +57,9 @@
                 cursor: pointer;
             }
 
-                .feedback-container input:hover {
-                    background-color: #004494;
-                }
+            .feedback-container input[type="submit"]:hover {
+                background-color: #004494;
+            }
 
         #topic{
             font-size: 200%;
@@ -78,36 +75,102 @@
         }
     </style>
 
-    <script type="text/javascript">
-        window.onload = function topic_question_load() {
-
-            /*will replace the topic and question placeholders with questions from db
-            document.getElementById('topic').innerHTML = '';
-            document.getElementById('question').innerHTML = '';*/
-            //alert('The Questions will Change Upon Loading Page')
-        }
-
-        function submit_feedback() {
-            var feedback = document.getElementById('feedbackValue').value;
-            alert(feedback);
-        }
-
-    </script>
-
 </head>
 <body>
 
     <form><!--what does it do when submitted? action-->
         <div class="feedback-container">
-            <h2 id="topic">Placeholder Topic</h2>
-            <h2 id="question">Placeholder Question</h2>
-            <br /><br />
-            <textarea id="feedbackValue"></textarea>
-            <input type="submit" onclick ="submit_feedback()" value="Submit Feedback">
+            <h1>Select Topic and Questions</h1>
+
+            <div>
+                <label for="topicSelect">Select Topic:</label>
+                <select id="topicSelect"></select>
+            </div>
+
+            <div>
+                <label for="questionSelect">Select Question:</label>
+                <select id="questionSelect"></select>
+            </div>
+
+            <div>
+                <textarea id="feedbackValue"></textarea>
+                <input type="submit" value="Submit Feedback">
+            </div>
         </div>
-        
     </form>
-    
+
+    <script type="text/javascript">
+        // Function to fetch data from the web service
+        function fetchData(url) {
+            return fetch(url)
+                .then(response => {
+                    // Check if the response is successful (status code in the range 200-299)
+                    // If response is not ok, throw an error
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    // Parse the response body as JSON and return the result
+                    return response.json();
+                });
+        }
+
+        // Function to populate dropdown with options
+        function populateDropdown(elementId, data) {
+            var dropdown = document.getElementById(elementId);
+            dropdown.innerHTML = "";
+            // Loop through the data array and create an option element for each item
+            data.forEach(function (item) {
+                var option = document.createElement("option");
+                option.value = item;
+                option.textContent = item;
+                // Append the option to the dropdown
+                dropdown.appendChild(option);
+            });
+        }
+
+        // Parse XML response
+        function parseXMLResponse(xmlString) {
+            // Create a parser object
+            const parser = new DOMParser();
+            // Parse XML into a document
+            const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+            // Get all "string" elements
+            const stringElements = xmlDoc.getElementsByTagName("string");
+            // Array to store topics
+            const topics = [];
+            // Extract text content from each string element
+            for (let i = 0; i < stringElements.length; i++) {
+                topics.push(stringElements[i].textContent);
+            }
+            // Return topics array
+            return topics;
+        }
+
+        // Fetch topics and populate the topics dropdown
+        fetchData("ProjectServices.asmx/GetTopics")
+            .then(function (xmlResponse) {
+                const topics = parseXMLResponse(xmlResponse);
+                populateDropdown("topicSelect", topics);
+            })
+            .catch(function (error) {
+                // Log an error message if fetching topics fails
+                console.error('Error fetching topics:', error);
+            });
+
+        // Get the topic from the dropdown and fetch questions based on topic
+        document.getElementById("topicSelect").addEventListener("change", function () {
+            var selectedTopic = this.value;
+            fetchData("ProjectServices.asmx/GetQuestions?topicId=" + selectedTopic)
+                .then(function (questions) {
+                    populateDropdown("questionSelect", questions);
+                })
+                .catch(function (error) {
+                    // Log an error message if fetching questions fails
+                    console.error('Error fetching questions:', error);
+                });
+        });
+
+    </script>
 
 </body>
 </html>

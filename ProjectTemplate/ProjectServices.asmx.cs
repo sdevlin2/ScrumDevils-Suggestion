@@ -9,62 +9,63 @@ using System.Data;
 
 namespace ProjectTemplate
 {
-	[WebService(Namespace = "http://tempuri.org/")]
-	[WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
-	[System.ComponentModel.ToolboxItem(false)]
-	[System.Web.Script.Services.ScriptService]
+    [WebService(Namespace = "http://tempuri.org/")]
+    [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
+    [System.ComponentModel.ToolboxItem(false)]
+    [System.Web.Script.Services.ScriptService]
 
-	public class ProjectServices : System.Web.Services.WebService
-	{
-		////////////////////////////////////////////////////////////////////////
-		///replace the values of these variables with your database credentials
-		////////////////////////////////////////////////////////////////////////
-		private string dbID = "spring2024team4";
-		private string dbPass = "spring2024team4";
-		private string dbName = "spring2024team4";
-		////////////////////////////////////////////////////////////////////////
-		
-		////////////////////////////////////////////////////////////////////////
-		///call this method anywhere that you need the connection string!
-		////////////////////////////////////////////////////////////////////////
-		private string getConString() {
-			return "SERVER=107.180.1.16; PORT=3306; DATABASE=" + dbName+"; UID=" + dbID + "; PASSWORD=" + dbPass;
-		}
-		////////////////////////////////////////////////////////////////////////
+    public class ProjectServices : System.Web.Services.WebService
+    {
+        ////////////////////////////////////////////////////////////////////////
+        ///replace the values of these variables with your database credentials
+        ////////////////////////////////////////////////////////////////////////
+        private string dbID = "spring2024team4";
+        private string dbPass = "spring2024team4";
+        private string dbName = "spring2024team4";
+        ////////////////////////////////////////////////////////////////////////
+
+        ////////////////////////////////////////////////////////////////////////
+        ///call this method anywhere that you need the connection string!
+        ////////////////////////////////////////////////////////////////////////
+        private string getConString()
+        {
+            return "SERVER=107.180.1.16; PORT=3306; DATABASE=" + dbName + "; UID=" + dbID + "; PASSWORD=" + dbPass;
+        }
+        ////////////////////////////////////////////////////////////////////////
 
 
 
-		/////////////////////////////////////////////////////////////////////////
-		//don't forget to include this decoration above each method that you want
-		//to be exposed as a web service!
-		[WebMethod(EnableSession = true)]
-		/////////////////////////////////////////////////////////////////////////
-		public string TestConnection()
-		{
-			try
-			{
+        /////////////////////////////////////////////////////////////////////////
+        //don't forget to include this decoration above each method that you want
+        //to be exposed as a web service!
+        [WebMethod(EnableSession = true)]
+        /////////////////////////////////////////////////////////////////////////
+        public string TestConnection()
+        {
+            try
+            {
 
-				string testQuery = "select * from Users";
+                string testQuery = "select * from Users";
 
-				////////////////////////////////////////////////////////////////////////
-				///here's an example of using the getConString method!
-				////////////////////////////////////////////////////////////////////////
-				MySqlConnection con = new MySqlConnection(getConString());
-				////////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////////////////
+                ///here's an example of using the getConString method!
+                ////////////////////////////////////////////////////////////////////////
+                MySqlConnection con = new MySqlConnection(getConString());
+                ////////////////////////////////////////////////////////////////////////
 
-				MySqlCommand cmd = new MySqlCommand(testQuery, con);
-				MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
-				DataTable table = new DataTable();
-				adapter.Fill(table);
-				return "Success!";
-			}
-			catch (Exception e)
-			{
-				return "Something went wrong, please check your credentials and db name and try again.  Error: "+e.Message;
-			}
-		}
+                MySqlCommand cmd = new MySqlCommand(testQuery, con);
+                MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+                DataTable table = new DataTable();
+                adapter.Fill(table);
+                return "Success!";
+            }
+            catch (Exception e)
+            {
+                return "Something went wrong, please check your credentials and db name and try again.  Error: " + e.Message;
+            }
+        }
 
-		//LOG ON METHOD
+        //LOG ON METHOD
         [WebMethod]
         public bool LogOn(string uid, string pass)
         {
@@ -102,7 +103,7 @@ namespace ProjectTemplate
             //a legit account
             if (sqlDt.Rows.Count > 0)
             {
-				//flip our flag to true so we return a value that lets them know they're logged in
+                //flip our flag to true so we return a value that lets them know they're logged in
                 success = true;
             }
             //return the result!
@@ -123,7 +124,7 @@ namespace ProjectTemplate
 
             sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(uid));
             sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
-            
+
 
             //this time, we're not using a data adapter to fill a data table.  We're just
             //opening the connection, telling our command to "executescalar" which says basically
@@ -228,20 +229,58 @@ namespace ProjectTemplate
             }
         }
 
-        [WebMethod]
-		public Person[] getBries(int userCount)
+        // Pull topics dynamically from the database
+        [WebMethod(EnableSession = true)]
+        public List<string> GetTopics()
         {
-			List<Person> people = new List<Person>();
-			for (int i = 0; i < userCount; i++)
-			{
-				Person brie = new Person();
-				brie.firstName = "Brie";
-				brie.lastName = "Jaramillo";
-				brie.phoneNumber = 1234567890;
-				people.Add(brie);
-			}
+            List<string> topics = new List<string>();
+            string connectionString = getConString();
 
-            return people.ToArray();
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                string sqlQuery = "SELECT TopicName FROM Topics";
+
+                using (MySqlCommand command = new MySqlCommand(sqlQuery, connection))
+                {
+                    connection.Open();
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            topics.Add(reader.GetString("TopicName"));
+                        }
+                    }
+                }
+            }
+
+            return topics;
         }
-	}
+
+        // pull questions dynamically from the DB
+        [WebMethod(EnableSession = true)]
+        public List<string> GetQuestions(int topicId)
+        {
+            List<string> questions = new List<string>();
+            string connectionString = getConString();
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                string sqlQuery = "SELECT Question FROM Questions WHERE idTopics = @TopicId";
+                using (MySqlCommand command = new MySqlCommand(sqlQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@TopicId", topicId);
+                    connection.Open();
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            questions.Add(reader.GetString("Question"));
+                        }
+                    }
+                }
+            }
+
+            return questions;
+        }
+    }
 }
