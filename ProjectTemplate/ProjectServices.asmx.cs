@@ -150,13 +150,20 @@ namespace ProjectTemplate
         public string IncrementSwipes(string userid)
         {
             //This method increments the swipes value in the MySQL DB. Method should be invoked when a user makes a "yes" swipe.
+            if (!CanUserSwipe(userid))
+            {
+                return "Swipe limit reached for today.";
+            }
 
             try
             {
                 // SQL UPDATE command to increment swipes value
                 string sqlUpdate = "UPDATE Users SET swipes = swipes + 1 WHERE userid = @userid";
+                string sqlUpdateSwipeDate = "UPDATE Users SET lastSwipeDate = CURDATE() WHERE userid = @userid";
 
                 using (MySqlConnection con = new MySqlConnection(getConString()))
+                using (MySqlCommand cmdUpdateSwipeDate = new MySqlCommand(sqlUpdateSwipeDate, con))
+
                 {
                     // Open connection
                     con.Open();
@@ -166,6 +173,8 @@ namespace ProjectTemplate
                     {
                         // Add the userid parameter to the command
                         cmd.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+                        cmdUpdateSwipeDate.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+
 
                         int rowsAffected = cmd.ExecuteNonQuery();
 
@@ -227,6 +236,76 @@ namespace ProjectTemplate
                 return -1;
             }
         }
+
+        // Method to check if a user can swipe
+        public bool CanUserSwipe(string userid)
+        {
+            try
+            {
+                string sqlSelect = "SELECT swipes, lastSwipeDate FROM Users WHERE userid = @userid";
+                using (MySqlConnection con = new MySqlConnection(getConString()))
+                {
+                    con.Open();
+                    using (MySqlCommand cmd = new MySqlCommand(sqlSelect, con))
+                    {
+                        cmd.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                int swipes = reader.GetInt32(0);
+                                // Check for DBNull to handle NULL lastSwipeDate values
+                                DateTime? lastSwipeDate = reader.IsDBNull(1) ? (DateTime?)null : reader.GetDateTime(1);
+
+                                // If the last swipe date is null or not today, reset swipes and lastSwipeDate.
+                                if (!lastSwipeDate.HasValue || lastSwipeDate.Value.Date != DateTime.Now.Date)
+                                {
+                                    ResetSwipes(userid); // This will set the lastSwipeDate to today and swipes to 0.
+                                    return true; // Since we reset, the user can swipe.
+                                }
+
+                                // Now we can simply check if the swipes are less than 3 to allow a new swipe.
+                                return swipes < 3;
+                            }
+                            else
+                            {
+                                return false; // User not found.
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                return false; // In case of error, block swipe.
+            }
+        }
+
+
+
+        // Method to reset swipes count to 0 and update lastSwipeDate to today.
+        private void ResetSwipes(string userid)
+        {
+            try
+            {
+                string sqlUpdate = "UPDATE Users SET swipes = 0, lastSwipeDate = CURDATE() WHERE userid = @userid";
+                using (MySqlConnection con = new MySqlConnection(getConString()))
+                {
+                    con.Open();
+                    using (MySqlCommand cmd = new MySqlCommand(sqlUpdate, con))
+                    {
+                        cmd.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // Handle exceptions (e.g., log the error)
+            }
+        }
+
+
 
         [WebMethod]
 		public Person[] getBries(int userCount)
