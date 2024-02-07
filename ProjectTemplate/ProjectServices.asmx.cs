@@ -335,19 +335,25 @@ namespace ProjectTemplate
             return topics;
         }
 
-        // pull questions dynamically from the DB
+        // pull questions dynamically from the DB. Changing this to use topicId instead of TopicName is a good idea.
         [WebMethod(EnableSession = true)]
-        public List<string> GetQuestions(int topicId)
+        public List<string> GetQuestions(string topicName)
         {
             List<string> questions = new List<string>();
             string connectionString = getConString();
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                string sqlQuery = "SELECT Question FROM Questions WHERE idTopics = @TopicId";
+                //SQL Query to Join 
+                string sqlQuery = @"
+            SELECT q.Question 
+            FROM Questions q
+            JOIN Topics t ON q.idTopics = t.idTopics
+            WHERE t.TopicName = @TopicName";
+
                 using (MySqlCommand command = new MySqlCommand(sqlQuery, connection))
                 {
-                    command.Parameters.AddWithValue("@TopicId", topicId);
+                    command.Parameters.AddWithValue("@TopicName", HttpUtility.UrlDecode(topicName));
                     connection.Open();
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
