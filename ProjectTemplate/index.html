@@ -210,7 +210,7 @@
                 },
                 error: function (e) {
                     alert("this code will only execute if javascript is unable to access the webservice");
-                    window.location.href = "feedback.html";
+                    showPanel('accountsPanel'); //CHANGE WHEN 
                 }
             });
         }
@@ -225,7 +225,8 @@
         }
 
         function suggestionInput() {
-            showPanel('suggestionPage');
+            window.location.href = "feedback.html";
+            //showPanel('suggestionPage');
         }
 
        // Allows the user to go back to main content page
