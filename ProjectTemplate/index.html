@@ -4,337 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login Page</title>
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
-    <style>
-
-        /* CSS */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-            margin: 0px;
-            position:relative;
-        }
-
-
-        .login-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            
-
-            max-width: 450px;
-            text-align: center; /* Centering content */
-            font-size: 18px;
-
-        }
-
-            .login-container img {
-                max-width: 120px;
-                height: auto; 
-                margin-bottom: 20px; 
-            }
-
-            .login-container input,
-            .login-container button {
-                margin: 20px 0; 
-            }
-
-            .login-container input,
-            .login-container button {
-                width: 100%;
-                padding: 15px;
-                margin: 15px 0;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                box-sizing: border-box;
-            }
-
-            .login-container button {
-                background-color: #0056b3;
-                color: white;
-                border: none;
-                cursor: pointer;
-            }
-
-                .login-container button:hover {
-                    background-color: #004494;
-                }
-
-        #loginMessage {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-
-        /*New CSS for main content page*/
-
-        .content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-        }
-
-
-
-        .mainPage {
-           background-color: white;
-            height: 100vh;
-            width: 100vw;
-            position: absolute;
-            visibility: hidden;
-            right:  0px;
-            bottom: 0px;
-        }
-
-            .mainPage #newAccount {
-                text-align: center; /* Center the content within newAccount */
-            }
-
-                .mainPage #newAccount input {
-                    padding: 10px;
-                    margin: 10px 0;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    box-sizing: border-box;
-
-                }
-
-        .accountContainer {
-            background-color: white;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 400px;
-            margin: auto;
-            font-size: 18px;
-            margin-top: 100px;
-           
-            
-        }
-
-                .accountContainer input{
-                    width:100%;
-                    clear: both;
-                    flex: 1;
-                    text-align:center;
-                }
-
-                .accountContainer button {
-                    width: 100%; /* Set button width to 100% */
-                    padding: 15px;
-                    margin: 15px 0;
-                    border: none;
-                    border-radius: 4px;
-                    box-sizing: border-box;
-                    background-color: #0056b3;
-                    color: white;
-                    cursor: pointer;
-                }
-
-                .accountContainer button:hover {
-                    background-color: #004494;
-                }
-           
-        .content button {
-                width: 200px;
-                padding: 20px;
-                margin: 10px;
-                font-size: 24px;
-                cursor: pointer;
-         }
-
-            .content .buttons {
-                text-align: center;
-            }
-
-            .content img {
-                height: 35vh;
-            }
-
-            #header {
-                background-color: blue;
-                padding: 20px;
-            }
-
-
-            .profile-icon {
-                width: 60px;
-                height: 60px;
-                background-color: #ddd;
-                border-radius: 50%;
-                margin-right: 10px;
-            }
-
-
-    </style>
-
-    <!-- JS-->
-
-    <script type="text/javascript">
-
-        var contentPanels = ['logonPanel','newAccount', 'suggestionPage', 'accountsPanel', 'leaderBoardPage', 'matchingPage', 'login-container'];
-        //this function toggles which panel is showing, and also clears data from all panels
-        function showPanel(panelId) {
-            
-            for (var i = 0; i < contentPanels.length; i++) {
-                if (panelId == contentPanels[i]) {
-                    $("#" + contentPanels[i]).css("visibility", "visible");
-                }
-                else {
-                    $("#" + contentPanels[i]).css("visibility", "hidden");
-                }
-            }
-        }
-
- 
-
-        jQuery(function () {
-            //when the app loads, show the logon panel to start with!
-            showPanel('logonPanel');
-        });
-
-
-        function TestButtonHandler() {
-            var userCountValue = document.getElementById("userCountInput").value;
-            var webMethod = "ProjectServices.asmx/getBries";
-            var parameters = "{\"userCount\":\"" + encodeURI(userCountValue) + "\"}";
-
-            $.ajax({
-                type: "POST",
-                url: webMethod,
-                data: parameters,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    var responseFromServer = msg.d;
-                    for (var i = 0; i < responseFromServer.length; i++) {
-                        alert(responseFromServer[i].firstName);
-                        alert(responseFromServer[i].lastName);
-                        alert(responseFromServer[i].phoneNumber);
-                    }
-                    doThisAfterServerStuff();
-                },
-                error: function (e) {
-                    alert("this code will only execute if JavaScript is unable to access the web service");
-                }
-            });
-
-            function doThisAfterServerStuff() {
-                alert("you thought this would execute after the code in my success function, didn't you!?");
-            }
-        }
-
-        function logon() {
-            var id = document.getElementById("logonID").value;
-            var pass = document.getElementById("logonPass").value;
-            var webMethod = "ProjectServices.asmx/LogOn";
-            var parameters = "{\"uid\":\"" + encodeURI(id) + "\", \"pass\":\"" + encodeURI(pass) + "\"}";
-
-            $.ajax({
-                type: "POST",
-                url: webMethod,
-                data: parameters,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    var responseFromServer = msg.d;
-                    if (responseFromServer == true) {
-                        
-                        showPanel('accountsPanel');   //When user logins with correct credentials it will take them to main content page
-                    } else {
-                        alert("Bad credentials");
-                        
-                    }
-                },
-                error: function (e) {
-                    alert("this code will only execute if javascript is unable to access the webservice");
-                    showPanel('accountsPanel'); //CHANGE WHEN DB IS UP
-                }
-            });
-        }
-
-        function CreateAccount() {
-            var id = document.getElementById("newId").value;
-            var pass = document.getElementById("newPassword").value;
-            var webMethod = "ProjectServices.asmx/RequestAccount";
-            var parameters = "{\"uid\":\"" + encodeURI(id) + "\", \"pass\":\"" + encodeURI(pass) + "\"}";
-
-            $.ajax({
-                type: "POST",
-                url: webMethod,
-                data: parameters,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    showPanel("newAccount");
-                    alert("Welcome to Work Pulse!");
-                    showPanel('logonPanel');
-                },
-                error: function (e) {
-                    alert("Something went wrong");
-                }
-            });
-        }
-
-        //each button selected will take them to designated page
-        function leaderBoard() {
-            showPanel('leaderBoardPage');
-        }
-
-        function match() {
-            showPanel('matchingPage');
-        }
-
-        function suggestionInput() {
-            window.location.href = "feedback.html";
-            //showPanel('suggestionPage');
-        }
-
-       // Allows the user to go back to main content page
-        function goBack() {
-            showPanel('accountsPanel');
-        }
-
-        // Call logon function when Enter key is pressed
-        function handleEnterKey(event) {
-            if (event.keyCode === 13) { //Enter key
-                logon(); // Call the logon function
-            }
-        }
-
-        /* test function for incrementSwipes follows 
-        function incrementSwipes() {
-            var userid = "Steven"; // Hardcoded for testing, can make dynamic when implemented
-            var webMethod = "ProjectServices.asmx/IncrementSwipes";
-            var parameters = "{\"userid\":\"" + encodeURI(userid) + "\"}";
-
-            $.ajax({
-                type: "POST",
-                url: webMethod,
-                data: parameters,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    alert("Swipes incremented successfully.");
-                },
-                error: function (e) {
-                    alert("Error: Unable to increment swipes.");
-                }
-            });
-        }
-        */
-    </script>
+    <link rel="stylesheet" href="style.css">
+    
 </head>
 <body>
 
@@ -363,13 +37,20 @@
                     <div class="content">
                         <img src="logo-color.jpg" alt="User Profile">
 
+
+
                         <button onclick="leaderBoard()" id="lbButton">Leaderboard</button>
                         <button onclick="match()" id="mButton">Matching</button>
                         <button onclick="suggestionInput()" id="sButton">Suggestions</button>
 
+                        <div id="pointCounter">
+                            <h2>Points: <span id='numberCounter'>0</span></h2>
+
+                        </div>
+
                         <!-- Test button for testing functions follows
-                        <button onclick="incrementSwipes()" id="incrementSwipesButton">Test</button>
-                            -->
+    <button onclick="incrementSwipes()" id="incrementSwipesButton">Test</button>
+        -->
                     </div>          
         </div>
 
@@ -417,11 +98,6 @@
 
 </body>
 </html>
-<script type="text/javascript">
 
-    // Event listeners for user and password fields
+<script src="script.js"></script>
 
-    document.getElementById('logonID').addEventListener('keyup', handleEnterKey);
-    document.getElementById('logonPass').addEventListener('keyup', handleEnterKey);
-
-</script>

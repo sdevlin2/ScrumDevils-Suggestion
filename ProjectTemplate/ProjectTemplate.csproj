@@ -94,6 +94,7 @@
     <Content Include="Global.asax" />
     <Content Include="index.html" />
     <Content Include="ProjectServices.asmx" />
+    <Content Include="script.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +108,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="style.css" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
