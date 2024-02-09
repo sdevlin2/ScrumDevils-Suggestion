@@ -367,5 +367,53 @@ namespace ProjectTemplate
 
             return questions;
         }
+
+        [WebMethod(EnableSession = true)]
+        public int GetSuggestionCountByUser(string userid)
+        {
+            int suggestionCount = 0;
+            string sqlConnectString = getConString();
+            // SQL query to count the number of suggestions made by a user
+            string sqlSelect = "SELECT COUNT(*) FROM UserSuggestions WHERE UserId = (SELECT id FROM Users WHERE userid = @userid)";
+
+            // Set up our connection object to use our connection string
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            // Set up our command object to use our connection, and our query
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            // Tell our command to replace the @parameter with the actual user id value
+            sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+
+            // Open the connection and execute the query
+            try
+            {
+                sqlConnection.Open();
+                // ExecuteScalar returns the first column of the first row in the resultset
+                suggestionCount = Convert.ToInt32(sqlCommand.ExecuteScalar());
+            }
+            catch (Exception e)
+            {
+                // Handle any errors that may occur
+                Console.WriteLine("An error occurred: " + e.Message);
+                suggestionCount = -1; // Returning -1 to indicate an error
+            }
+            finally
+            {
+                // Always close the connection when done
+                if (sqlConnection != null)
+                {
+                    sqlConnection.Close();
+                }
+            }
+            // Return the count of suggestions
+            return suggestionCount;
+        }
+
+
+
+
+
+
+
     }
 }
