@@ -7,11 +7,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
+    <script src="script.js"></script>
 
 </head>
 <body>
 
-    <form><!--what does it do when submitted? action-->
+    <form>
+        <!--what does it do when submitted? action-->
         <div class="feedback-container">
             <h1>Select Topic and Questions</h1>
 
@@ -32,7 +34,33 @@
         </div>
     </form>
 
-    <script src="script.js"></script>
-
 </body>
 </html>
+
+<script>
+
+    // Get the topic from the dropdown and fetch questions based on topic.
+    // Changing this to use topic id instead of topic name would be far more elegant. See GetQuestions service.
+    document.getElementById("topicSelect").addEventListener("change", function () {
+        var selectedTopic = this.value;
+        fetchData("ProjectServices.asmx/GetQuestions?topicName=" + selectedTopic)
+            .then(function (questions) {
+                populateDropdown("questionSelect", questions);
+            })
+            .catch(function (error) {
+                // Log an error message if fetching questions fails
+                console.error('Error fetching questions:', error);
+            });
+    });
+
+    // Fetch topics and populate the topics dropdown
+    fetchData("ProjectServices.asmx/GetTopics")
+        .then(function (topics) {
+            populateDropdown("topicSelect", topics);
+        })
+        .catch(function (error) {
+            console.error('Error fetching topics:', error);
+        });
+
+
+    </script>
