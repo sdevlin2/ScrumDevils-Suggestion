@@ -128,8 +128,7 @@ function handleEnterKey(event) {
     }
 }
 
-document.getElementById('logonID').addEventListener('keyup', handleEnterKey);
-document.getElementById('logonPass').addEventListener('keyup', handleEnterKey);
+
 
 /* test function for incrementSwipes follows
 function incrementSwipes() {
@@ -197,26 +196,4 @@ function parseXMLResponse(xmlString) {
     return topics;
 }
 
-// Fetch topics and populate the topics dropdown
-fetchData("ProjectServices.asmx/GetTopics")
-    .then(function (topics) {
-        populateDropdown("topicSelect", topics);
-    })
-    .catch(function (error) {
-        console.error('Error fetching topics:', error);
-    });
 
-// Get the topic from the dropdown and fetch questions based on topic. 
-// Changing this to use topic id instead of topic name would be far more elegant. See GetQuestions service. 
-document.getElementById("topicSelect").addEventListener("change", function () {
-    var selectedTopic = this.value;
-    fetchData("ProjectServices.asmx/GetQuestions?topicName=" + selectedTopic)
-        .then(function (questions) {
-            populateDropdown("questionSelect", questions);
-        })
-        .catch(function (error) {
-            // Log an error message if fetching questions fails
-            console.error('Error fetching questions:', error);
-        });
-});
-//end of feedback js code

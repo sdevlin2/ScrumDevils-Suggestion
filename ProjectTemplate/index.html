@@ -4,11 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login Page</title>
-    
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    
+    <script src="script.js"></script>
+
 </head>
 <body>
 
@@ -25,6 +26,7 @@
             <button onclick="logon();">Log In</button>
             <button onclick="showPanel('newAccount')">Create an account</button>
             <div id="loginMessage"></div>
+
 
         </div>
 
@@ -99,5 +101,7 @@
 </body>
 </html>
 
-<script src="script.js"></script>
-
+<script>
+    document.getElementById('logonID').addEventListener('keyup', handleEnterKey);
+    document.getElementById('logonPass').addEventListener('keyup', handleEnterKey);
+</script>
