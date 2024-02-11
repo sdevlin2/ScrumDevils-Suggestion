@@ -1,4 +1,7 @@
 var contentPanels = ['logonPanel', 'newAccount', 'suggestionPage', 'accountsPanel', 'leaderBoardPage', 'matchingPage', 'login-container'];
+let pointTotal = 0;
+
+
 //this function toggles which panel is showing, and also clears data from all panels
 function showPanel(panelId) {
 
@@ -114,6 +117,16 @@ function match() {
 function suggestionInput() {
     window.location.href = "feedback.html";
     //showPanel('suggestionPage');
+}
+
+function pointCounter() {
+    
+
+    pointTotal++;
+
+    document.getElementById('numberCounter').innerHTML = pointTotal;
+
+    console.log(pointTotal);
 }
 
 // Allows the user to go back to main content page
