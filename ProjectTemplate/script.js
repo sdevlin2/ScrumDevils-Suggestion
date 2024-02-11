@@ -108,7 +108,10 @@ function leaderBoard() {
 }
 
 function match() {
-    showPanel('matchingPage');
+    showPanel('matchingPage'); 
+
+    
+    
 }
 
 function suggestionInput() {
@@ -220,3 +223,5 @@ document.getElementById("topicSelect").addEventListener("change", function () {
         });
 });
 //end of feedback js code
+
+// Matching page to allow swipes of agree or skip

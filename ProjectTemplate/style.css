@@ -152,6 +152,12 @@ body {
     height: 35vh;
 }
 
+.button-alert{
+    margin: 6px;
+    padding: 6px 12px;
+    border-radius: 10px;
+}
+
 #header {
     background-color: blue;
     padding: 20px;
@@ -164,6 +170,16 @@ body {
     background-color: #ddd;
     border-radius: 50%;
     margin-right: 10px;
+}
+
+.button-swipe {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    float: left;
+    box-sizing: border-box;
 }
 
 /*feedback page*/
@@ -216,3 +232,23 @@ body {
     font-size: 150%;
 }
 /*end of feedback page*/
+
+
+#draggableObject {
+    width: 100px;
+    height: 50px;
+    background-color: lightcoral;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+}
+
+#activateButton {
+    width: 100px;
+    height: 50px;
+    background-color: lightgreen;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: none;
+}
