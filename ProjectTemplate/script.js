@@ -111,7 +111,10 @@ function leaderBoard() {
 }
 
 function match() {
-    showPanel('matchingPage');
+    showPanel('matchingPage'); 
+
+    
+    
 }
 
 function suggestionInput() {
@@ -210,3 +213,17 @@ function parseXMLResponse(xmlString) {
 }
 
 
+// Get the topic from the dropdown and fetch questions based on topic. 
+// Changing this to use topic id instead of topic name would be far more elegant. See GetQuestions service. 
+document.getElementById("topicSelect").addEventListener("change", function () {
+    var selectedTopic = this.value;
+    fetchData("ProjectServices.asmx/GetQuestions?topicName=" + selectedTopic)
+        .then(function (questions) {
+            populateDropdown("questionSelect", questions);
+        })
+        .catch(function (error) {
+            // Log an error message if fetching questions fails
+            console.error('Error fetching questions:', error);
+        });
+});
+//end of feedback js code

@@ -8,9 +8,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
-
+    
 </head>
+
 <body>
 
 
@@ -23,7 +23,7 @@
             <h2>Login</h2>
             <input type="text" id="logonID" placeholder="Username" />
             <input type="password" id="logonPass" placeholder="Password" />
-            <button onclick="logon();">Log In</button>
+            <button onclick="logon()">Log In</button>
             <button onclick="showPanel('newAccount')">Create an account</button>
             <div id="loginMessage"></div>
 
@@ -31,41 +31,46 @@
         </div>
 
         <div id="accountsPanel" class="mainPage">
-                
-                    <div id="header" class="header">
-                        <div class="profile-icon"></div>
-                    </div>
-                
-                    <div class="content">
-                        <img src="logo-color.jpg" alt="User Profile">
+
+            <div id="header" class="header">
+                <div class="profile-icon"></div>
+            </div>
+
+            <div class="content">
+                <img src="logo-color.jpg" alt="User Profile">
 
 
 
-                        <button onclick="leaderBoard()" id="lbButton">Leaderboard</button>
-                        <button onclick="match()" id="mButton">Matching</button>
-                        <button onclick="suggestionInput()" id="sButton">Suggestions</button>
+                <button onclick="leaderBoard()" id="lbButton">Leaderboard</button>
+                <button onclick="match()" id="mButton">Matching</button>
+                <button onclick="suggestionInput()" id="sButton">Suggestions</button>
 
-                        <div id="pointCounter">
-                            <h2>Points: <span id='numberCounter'>0</span></h2>
+                <div id="pointCounter">
+                    <h2>Points: <span id='numberCounter'>0</span></h2>
 
-                        </div>
+                </div>
 
-                        <!-- Test button for testing functions follows
-    <button onclick="incrementSwipes()" id="incrementSwipesButton">Test</button>
-        -->
-                    </div>          
+                <!-- Test button for testing functions follows
+                <button onclick="incrementSwipes()" id="incrementSwipesButton">Test</button>
+                    -->
+            </div>
         </div>
 
-        
+
         <div class="mainPage">
             <div id="leaderBoardPage">
                 <h1>Leader Board</h1>
                 <p></p>
                 <a href="#" onclick="goBack()">Go Back</a>
             </div>
-            <div id="matchingPage">
+            <div id="matchingPage" class="content">
                 <h1>Look who you matched with!</h1>
                 <p></p>
+                <img id="logoPic" src="logo-color.jpg" alt="User Profile">
+
+                <button id="nope" class="button-swipe" onclick="handleSwipe(false)">&lArr; Skip</button>
+                <button id="like" class="button-swipe" onclick="handleSwipe(true)">&rArr; Agree</button>
+
                 <a href="#" onclick="goBack()">Go Back</a>
             </div>
             <div id="suggestionPage">
@@ -85,23 +90,129 @@
                 </div>
                 <div>
                     <label>Create Password:</label>
-                    <input type="password"  id="newPassword" />
+                    <input type="password" id="newPassword" />
                 </div>
                 <div>
                     <button onclick="CreateAccount()">Submit</button>
                 </div>
             </div>
         </div>
-   
 
-    
+
+
 
     </div>
 
 </body>
+<script>
+    let startPoint;
+    let offsetX;
+    let offsetY;
+    let isDragging = false;
+    let logoPic;
+
+
+
+    const init = () => {
+        logoPic = document.getElementById('logoPic');// Need to change to show Topics, Questions and Suggestions
+
+
+        const handleMouseMove = (e) => {
+            e.preventDefault();
+            if (!startPoint) return;
+            const { clientX, clientY } = e;
+            offsetX = clientX - startPoint.x;
+            offsetY = clientY - startPoint.y;
+            logoPic.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        };
+
+        logoPic.addEventListener('dragstart', e => {
+            e.preventDefault();
+        })
+
+        const handleMouseUp = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            logoPic.style.transition = 'transform 0.5s ease';
+
+            // able to grab center of image/suggestion when updated
+            if (Math.abs(offsetX) > logoPic.offsetWidth / 4) {
+                handleSwipe(offsetX > 0);
+                
+            } else {
+                logoPic.style.transform = 'translateX(0)';
+            }
+
+            setTimeout(() => {
+                logoPic.style.transition = '';
+                logoPic.style.opacity = 1; // picture disappears when pulled left or right and new suggestion shows
+            }, 1000);
+        };
+
+        const listenToMouseEvents = () => {
+            logoPic.addEventListener('mousedown', (e) => {
+                const { clientX, clientY } = e;
+                startPoint = { x: clientX, y: clientY };
+                document.addEventListener('mousemove', handleMouseMove);
+                isDragging = true;
+                logoPic.style.transition = 'transform 0s';
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    handleMouseUp();
+                }
+            });
+
+        };
+
+
+        listenToMouseEvents();
+    };
+
+    function handleSwipe(liked) {
+        if (liked) {
+            console.log("Liked!");
+            animateSwipe('right');
+            
+        } else {
+            console.log("Disliked!");
+            animateSwipe('left');
+        }
+    }
+
+   
+    // animation for when button agree or skip is clicked to move Suggestions
+    function animateSwipe(direction) {
+        logoPic.style.transition = 'transform 1s';
+        logoPic.style.transform = `translate(${direction * window.innerWidth}px, ${offsetY}px) rotate(${90 * direction}deg)`;
+        logoPic.style.opacity = 0;
+        logoPic.classList.add('dismissing');
+        setTimeout(() => {
+            
+            showNextCard(); 
+        }, 1000);
+    }
+
+    function resetLogoPic() {
+
+        logoPic.style.transform = 'translateX(0)';
+        logoPic.style.opacity = 1;
+    }
+
+    //function to move onto next auggestion Topic
+    function showNextCard() {
+        
+        console.log("Showing the next card...");
+        resetLogoPic(); // Reset the logoPic position for the next card
+        logoPic.classList.remove('dismissing');
+    }
+
+
+    init();
+</script>
 </html>
 
-<script>
-    document.getElementById('logonID').addEventListener('keyup', handleEnterKey);
-    document.getElementById('logonPass').addEventListener('keyup', handleEnterKey);
-</script>
+<script src="script.js"></script>
+
