@@ -239,7 +239,7 @@ namespace ProjectTemplate
             }
         }
 
-        // Method to check if a user can swipe
+        // Method to check if a user can swipe limits to 3 a day
         public bool CanUserSwipe(string userid)
         {
             try
@@ -309,6 +309,9 @@ namespace ProjectTemplate
 
 
 
+
+
+
         // Pull topics dynamically from the database
         [WebMethod(EnableSession = true)]
         public List<string> GetTopics()
@@ -369,8 +372,125 @@ namespace ProjectTemplate
             return questions;
         }
 
+
+
+        // Gets daily amount of suggestions/entries user has made
+
+
         [WebMethod(EnableSession = true)]
-        public int GetSuggestionCountByUser(string userid)
+        public int GetDailySuggestionCountByUser(string userid)
+        {
+            int suggestionCount = 0;
+            string sqlConnectString = getConString();
+            // SQL query to get the count and the date of the latest suggestion by a user
+            string sqlSelect = @"
+        SELECT COUNT(*), MAX(Timestamp) FROM UserSuggestions 
+        WHERE UserId = (SELECT id FROM Users WHERE userid = @userid) 
+        AND DATE(Timestamp) = CURDATE()";
+
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+
+            try
+            {
+                sqlConnection.Open();
+                using (MySqlDataReader reader = sqlCommand.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        suggestionCount = reader.GetInt32(0);
+                        DateTime? lastSuggestionDate = reader.IsDBNull(1) ? (DateTime?)null : reader.GetDateTime(1);
+
+                        if (!lastSuggestionDate.HasValue || lastSuggestionDate.Value.Date != DateTime.Now.Date)
+                        {
+                            // Reset the count if the last suggestion was not made today
+                            suggestionCount = 0;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("An error occurred: " + e.Message);
+                suggestionCount = -1; // Returning -1 to indicate an error
+            }
+            finally
+            {
+                if (sqlConnection != null)
+                {
+                    sqlConnection.Close();
+                }
+            }
+            return suggestionCount;
+        }
+
+
+        // Adds suggestion and limits daily entry to 3 per user
+
+
+        [WebMethod(EnableSession = true)]
+        public string AddUserSuggestion(string userid, string suggestionName, string suggestionText)
+        {
+            // Check if the user has already made 3 suggestions today
+            int currentSuggestionCount = GetDailySuggestionCountByUser(userid);
+            if (currentSuggestionCount < 0)
+            {
+                return "An error occurred while checking your suggestion count.";
+            }
+            else if (currentSuggestionCount >= 3)
+            {
+                return "You have reached the daily limit of 3 suggestions.";
+            }
+            else
+            {
+                string sqlConnectString = getConString();
+                // SQL command to insert a new suggestion
+                string sqlInsert = @"
+            INSERT INTO UserSuggestions (UserId, SuggestionName, SuggestionText, Timestamp, likes) 
+            VALUES ((SELECT id FROM Users WHERE userid = @userid), @suggestionName, @suggestionText, NOW(), 0)";
+
+                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                MySqlCommand sqlCommand = new MySqlCommand(sqlInsert, sqlConnection);
+
+                sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+                sqlCommand.Parameters.AddWithValue("@suggestionName", HttpUtility.UrlDecode(suggestionName));
+                sqlCommand.Parameters.AddWithValue("@suggestionText", HttpUtility.UrlDecode(suggestionText));
+
+                try
+                {
+                    sqlConnection.Open();
+                    int rowsAffected = sqlCommand.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                    {
+                        return "Thank you for your suggestion!";
+                    }
+                    else
+                    {
+                        return "Failed to add the suggestion. Please try again.";
+                    }
+                }
+                catch (Exception e)
+                {
+                    return "An error occurred: " + e.Message;
+                }
+                finally
+                {
+                    if (sqlConnection != null)
+                    {
+                        sqlConnection.Close();
+                    }
+                }
+            }
+        }
+
+
+
+        // Checks how many total Suggestions a User has
+
+        [WebMethod(EnableSession = true)]
+        public int GetTotalSuggestionCountByUser(string userid)
         {
             int suggestionCount = 0;
             string sqlConnectString = getConString();
@@ -410,8 +530,7 @@ namespace ProjectTemplate
             return suggestionCount;
         }
 
-       
 
-        
+
     }
 }
