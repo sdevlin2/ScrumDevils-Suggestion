@@ -78,6 +78,7 @@ function logon() {
         error: function (e) {
             alert("this code will only execute if javascript is unable to access the webservice");
             showPanel('accountsPanel'); //CHANGE WHEN DB IS UP
+            document.getElementById("usernameShow").innerHTML = id;
         }
     });
 }
