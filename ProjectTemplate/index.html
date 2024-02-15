@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -15,6 +16,7 @@
 
 
     <!-- HTML -->
+    
 
     <div class="contentContainer">
         <div id="logonPanel" class="login-container">
@@ -30,13 +32,22 @@
 
         </div>
 
+
         <div id="accountsPanel" class="mainPage">
 
             <div id="header" class="header">
                 <div class="profile-icon"></div>
+                <a id="managerView" href="#" onclick="viewTickets()">View Employee Tickets</a>
+                <a id="logoff" href="#" onclick="LogOff()">Log Off</a>
             </div>
 
             <div class="content">
+                <span id="accountInfo">
+                    <h2 id="accountName">User: <span id="usernameShow"></span></h2>
+                    <h2 id="pointCounter">Points: <span id='pointsTotal'>0</span></h2>
+                </span>
+
+
                 <img src="logo-color.jpg" alt="User Profile">
 
 
@@ -45,14 +56,12 @@
                 <button onclick="match()" id="mButton">Matching</button>
                 <button onclick="suggestionInput()" id="sButton">Suggestions</button>
 
-                <div id="pointCounter">
-                    <h2>Points: <span id='numberCounter'>0</span></h2>
 
-                </div>
+
 
                 <!-- Test button for testing functions follows
-                <button onclick="incrementSwipes()" id="incrementSwipesButton">Test</button>
-                    -->
+        <button onclick="incrementSwipes()" id="incrementSwipesButton">Test</button>
+            -->
             </div>
         </div>
 
@@ -98,121 +107,25 @@
             </div>
         </div>
 
+        <div class="mainPage">
+            <div id="manager" class="accountContainer">
+                <h1>View Number of tickets for employees</h1>
+                <hr />
+                <p>Which employee would you like to look up?</p>
+                <input type="text" id="userid" placeholder="Enter Employee Username" />
+                <button onclick="ticketManager()">Submit</button>
+                <div style="text-align:center" id="displayTickets"></div>
+                <a href="#"  onclick="goBack()">Go Back</a>
+            </div>
+        </div>
+
 
 
 
     </div>
-
+    <script src="script.js"></script>
 </body>
-<script>
-    let startPoint;
-    let offsetX;
-    let offsetY;
-    let isDragging = false;
-    let logoPic;
 
-
-
-    const init = () => {
-        logoPic = document.getElementById('logoPic');// Need to change to show Topics, Questions and Suggestions
-
-
-        const handleMouseMove = (e) => {
-            e.preventDefault();
-            if (!startPoint) return;
-            const { clientX, clientY } = e;
-            offsetX = clientX - startPoint.x;
-            offsetY = clientY - startPoint.y;
-            logoPic.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-        };
-
-        logoPic.addEventListener('dragstart', e => {
-            e.preventDefault();
-        })
-
-        const handleMouseUp = () => {
-            if (!isDragging) return;
-            isDragging = false;
-            logoPic.style.transition = 'transform 0.5s ease';
-
-            // able to grab center of image/suggestion when updated
-            if (Math.abs(offsetX) > logoPic.offsetWidth / 4) {
-                handleSwipe(offsetX > 0);
-                
-            } else {
-                logoPic.style.transform = 'translateX(0)';
-            }
-
-            setTimeout(() => {
-                logoPic.style.transition = '';
-                logoPic.style.opacity = 1; // picture disappears when pulled left or right and new suggestion shows
-            }, 1000);
-        };
-
-        const listenToMouseEvents = () => {
-            logoPic.addEventListener('mousedown', (e) => {
-                const { clientX, clientY } = e;
-                startPoint = { x: clientX, y: clientY };
-                document.addEventListener('mousemove', handleMouseMove);
-                isDragging = true;
-                logoPic.style.transition = 'transform 0s';
-            });
-
-            document.addEventListener('mouseup', () => {
-                if (isDragging) {
-                    document.removeEventListener('mousemove', handleMouseMove);
-                    handleMouseUp();
-                }
-            });
-
-        };
-
-
-        listenToMouseEvents();
-    };
-
-    function handleSwipe(liked) {
-        if (liked) {
-            console.log("Liked!");
-            animateSwipe('right');
-            
-        } else {
-            console.log("Disliked!");
-            animateSwipe('left');
-        }
-    }
-
-   
-    // animation for when button agree or skip is clicked to move Suggestions
-    function animateSwipe(direction) {
-        logoPic.style.transition = 'transform 1s';
-        logoPic.style.transform = `translate(${direction * window.innerWidth}px, ${offsetY}px) rotate(${90 * direction}deg)`;
-        logoPic.style.opacity = 0;
-        logoPic.classList.add('dismissing');
-        setTimeout(() => {
-            
-            showNextCard(); 
-        }, 1000);
-    }
-
-    function resetLogoPic() {
-
-        logoPic.style.transform = 'translateX(0)';
-        logoPic.style.opacity = 1;
-    }
-
-    //function to move onto next auggestion Topic
-    function showNextCard() {
-        
-        console.log("Showing the next card...");
-        resetLogoPic(); // Reset the logoPic position for the next card
-        logoPic.classList.remove('dismissing');
-    }
-
-
-    init();
-</script>
 </html>
 
-<script src="script.js"></script>
 

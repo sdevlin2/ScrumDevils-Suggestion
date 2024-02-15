@@ -7,6 +7,7 @@ using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Data;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
 
 namespace ProjectTemplate
 {
@@ -105,10 +106,21 @@ namespace ProjectTemplate
             if (sqlDt.Rows.Count > 0)
             {
                 //flip our flag to true so we return a value that lets them know they're logged in
+                
                 success = true;
             }
             //return the result!
             return success;
+        }
+
+        [WebMethod(EnableSession = true)]
+        public bool LogOff()
+        {
+            //if they log off, then we remove the session.  That way, if they access
+            //again later they have to log back on in order for their ID to be back
+            //in the session!
+            Session.Abandon();
+            return true;
         }
 
         [WebMethod(EnableSession = true)]
@@ -141,6 +153,8 @@ namespace ProjectTemplate
                 //the requested account.  Really this is just an example to show you
                 //a query where you get the primary key of the inserted row back from
                 //the database!
+
+                UpdateTotalTicketCount(uid, 0);
             }
             catch (Exception e)
             {
@@ -239,7 +253,7 @@ namespace ProjectTemplate
             }
         }
 
-        // Method to check if a user can swipe
+        // Method to check if a user can swipe limits to 3 a day
         public bool CanUserSwipe(string userid)
         {
             try
@@ -309,6 +323,9 @@ namespace ProjectTemplate
 
 
 
+
+
+
         // Pull topics dynamically from the database
         [WebMethod(EnableSession = true)]
         public List<string> GetTopics()
@@ -369,8 +386,125 @@ namespace ProjectTemplate
             return questions;
         }
 
+
+
+        // Gets daily amount of suggestions/entries user has made
+
+
         [WebMethod(EnableSession = true)]
-        public int GetSuggestionCountByUser(string userid)
+        public int GetDailySuggestionCountByUser(string userid)
+        {
+            int suggestionCount = 0;
+            string sqlConnectString = getConString();
+            // SQL query to get the count and the date of the latest suggestion by a user
+            string sqlSelect = @"
+        SELECT COUNT(*), MAX(Timestamp) FROM UserSuggestions 
+        WHERE UserId = (SELECT id FROM Users WHERE userid = @userid) 
+        AND DATE(Timestamp) = CURDATE()";
+
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+
+            try
+            {
+                sqlConnection.Open();
+                using (MySqlDataReader reader = sqlCommand.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        suggestionCount = reader.GetInt32(0);
+                        DateTime? lastSuggestionDate = reader.IsDBNull(1) ? (DateTime?)null : reader.GetDateTime(1);
+
+                        if (!lastSuggestionDate.HasValue || lastSuggestionDate.Value.Date != DateTime.Now.Date)
+                        {
+                            // Reset the count if the last suggestion was not made today
+                            suggestionCount = 0;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("An error occurred: " + e.Message);
+                suggestionCount = -1; // Returning -1 to indicate an error
+            }
+            finally
+            {
+                if (sqlConnection != null)
+                {
+                    sqlConnection.Close();
+                }
+            }
+            return suggestionCount;
+        }
+
+
+        // Adds suggestion and limits daily entry to 3 per user
+
+
+        [WebMethod(EnableSession = true)]
+        public string AddUserSuggestion(string userid, string suggestionName, string suggestionText)
+        {
+            // Check if the user has already made 3 suggestions today
+            int currentSuggestionCount = GetDailySuggestionCountByUser(userid);
+            if (currentSuggestionCount < 0)
+            {
+                return "An error occurred while checking your suggestion count.";
+            }
+            else if (currentSuggestionCount >= 3)
+            {
+                return "You have reached the daily limit of 3 suggestions.";
+            }
+            else
+            {
+                string sqlConnectString = getConString();
+                // SQL command to insert a new suggestion
+                string sqlInsert = @"
+            INSERT INTO UserSuggestions (UserId, SuggestionName, SuggestionText, Timestamp, likes) 
+            VALUES ((SELECT id FROM Users WHERE userid = @userid), @suggestionName, @suggestionText, NOW(), 0)";
+
+                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                MySqlCommand sqlCommand = new MySqlCommand(sqlInsert, sqlConnection);
+
+                sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+                sqlCommand.Parameters.AddWithValue("@suggestionName", HttpUtility.UrlDecode(suggestionName));
+                sqlCommand.Parameters.AddWithValue("@suggestionText", HttpUtility.UrlDecode(suggestionText));
+
+                try
+                {
+                    sqlConnection.Open();
+                    int rowsAffected = sqlCommand.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                    {
+                        return "Thank you for your suggestion!";
+                    }
+                    else
+                    {
+                        return "Failed to add the suggestion. Please try again.";
+                    }
+                }
+                catch (Exception e)
+                {
+                    return "An error occurred: " + e.Message;
+                }
+                finally
+                {
+                    if (sqlConnection != null)
+                    {
+                        sqlConnection.Close();
+                    }
+                }
+            }
+        }
+
+
+
+        // Checks how many total Suggestions a User has
+
+        [WebMethod(EnableSession = true)]
+        public int GetTotalSuggestionCountByUser(string userid)
         {
             int suggestionCount = 0;
             string sqlConnectString = getConString();
@@ -410,8 +544,70 @@ namespace ProjectTemplate
             return suggestionCount;
         }
 
-       
+  
+        //When a new user is created a slot is generated in the Ticket table starting them off at zero tickets
+        private void UpdateTotalTicketCount(string uid, int ticketCount)
+        {
+            //inserts new user information into table
+            string sqlUpdate = "insert into Tickets (userid, tickets) values(@idValue, @ticketsValue); SELECT LAST_INSERT_ID();";
+            string sqlConnectString = getConString();
 
-        
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlUpdate, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(uid));
+            sqlCommand.Parameters.AddWithValue("@ticketsValue",ticketCount);
+
+            sqlConnection.Open();
+            //we're using a try/catch so that if the query errors out we can handle it gracefully
+            //by closing the connection and moving on
+            try
+            {
+                int accountID = Convert.ToInt32(sqlCommand.ExecuteScalar());
+                
+            }
+            catch (Exception e)
+            {
+            }
+            sqlConnection.Close();
+        }
+
+    
+        // Able to see ticket count for each user
+            [WebMethod(EnableSession = true)]
+        public int TotalTicketCount(string uid)
+        {
+
+            int ticketCount = 0;
+            string sqlConnectString = getConString();
+
+            //Uses SELECT to look throught the tickets table to pull total tickets of user
+            string sqlSelect = "SELECT tickets FROM Tickets WHERE userid = @userid";
+
+            using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
+            {
+                using (MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection))
+                {
+                    sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(uid));
+
+                    // Open the connection and execute the query
+                    try
+                    {
+                        sqlConnection.Open();
+                        // ExecuteScalar returns the first column of the first row in the resultset
+                        ticketCount = Convert.ToInt32(sqlCommand.ExecuteScalar());
+                    }
+                    catch (Exception e)
+                    {
+                        // Handle any errors that may occur
+                        Console.WriteLine("An error occurred: " + e.Message);
+                        ticketCount = -1; // Returning -1 to indicate an error
+                    }
+
+                }
+            }
+            return ticketCount;
+        }
+
     }
 }

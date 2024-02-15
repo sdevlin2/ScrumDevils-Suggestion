@@ -86,7 +86,7 @@ body {
     bottom: 0px;
 }
 
-.mainPage #newAccount {
+.mainPage #newAccount #manager {
     text-align: center; /* Center the content within newAccount */
 }
 
@@ -158,10 +158,18 @@ body {
     border-radius: 10px;
 }
 
-#header {
+.header {
     background-color: blue;
     padding: 20px;
+    text-align: right;
+    flex: 1;
 }
+    .header a {
+       
+        text-align: right;
+        color: #bbbbbb;
+    }
+  
 
 
 .profile-icon {
