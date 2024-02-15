@@ -499,12 +499,8 @@ namespace ProjectTemplate
             }
         }
 
-
-
-        // Checks how many total Suggestions a User has
-
         [WebMethod(EnableSession = true)]
-        public int GetTotalSuggestionCountByUser(string userid)
+        public int GetSuggestionCountByUser(string userid)
         {
             int suggestionCount = 0;
             string sqlConnectString = getConString();
@@ -581,33 +577,8 @@ namespace ProjectTemplate
             int ticketCount = 0;
             string sqlConnectString = getConString();
 
-            //Uses SELECT to look throught the tickets table to pull total tickets of user
-            string sqlSelect = "SELECT tickets FROM Tickets WHERE userid = @userid";
+       
 
-            using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
-            {
-                using (MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection))
-                {
-                    sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(uid));
-
-                    // Open the connection and execute the query
-                    try
-                    {
-                        sqlConnection.Open();
-                        // ExecuteScalar returns the first column of the first row in the resultset
-                        ticketCount = Convert.ToInt32(sqlCommand.ExecuteScalar());
-                    }
-                    catch (Exception e)
-                    {
-                        // Handle any errors that may occur
-                        Console.WriteLine("An error occurred: " + e.Message);
-                        ticketCount = -1; // Returning -1 to indicate an error
-                    }
-
-                }
-            }
-            return ticketCount;
-        }
-
+        
     }
 }

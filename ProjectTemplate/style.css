@@ -260,3 +260,15 @@ body {
     right: 0;
     display: none;
 }
+
+#accountName{
+    position:fixed;
+    top: 90px;
+    left:50px;
+}
+
+#pointCounter{
+    position:fixed;
+    top: 90px;
+    right:50px;
+}
