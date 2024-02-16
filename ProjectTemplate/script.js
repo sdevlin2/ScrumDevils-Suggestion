@@ -109,7 +109,7 @@ function showNextCard() {
     logoPic.classList.remove('dismissing');
 }
 
-init();
+// init();
 
 
 //this function toggles which panel is showing, and also clears data from all panels
@@ -366,6 +366,47 @@ function parseXMLResponse(xmlString) {
     // Return topics array
     return topics;
 }
+
+// Suggestion submission code. The wrappers are needed to prevent the script from loading except on
+// feedback.html
+document.addEventListener('DOMContentLoaded', function () {
+    var submitButton = document.getElementById('submitFeedback');
+    if (submitButton) {
+        submitButton.addEventListener('click', function (event) {
+            event.preventDefault(); 
+
+            // Capture user inputs
+            var userId = "5"; // This needs to be dynamically set based on the logged-in user
+            var topicId = document.getElementById("topicSelect").value;
+            var questionId = document.getElementById("questionSelect").value;
+            var suggestionText = document.getElementById("feedbackValue").value;
+
+            // Construct the parameters string for the AJAX call
+            var parameters = JSON.stringify({
+                uid: userId,
+                questionId: questionId,
+                topicId: topicId,
+                suggestionText: suggestionText
+            });
+
+            // Make the AJAX call to your web service
+            $.ajax({
+                type: "POST",
+                url: "ProjectServices.asmx/SubmitSuggestion",
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    alert("Suggestion submitted successfully!");
+                },
+                error: function (error) {
+                    console.error("Error submitting suggestion:", error);
+                    alert("Error submitting suggestion.");
+                }
+            });
+        });     //JavaScript isn't fun :(
+    }
+});
 
 
 //end of feedback js code
