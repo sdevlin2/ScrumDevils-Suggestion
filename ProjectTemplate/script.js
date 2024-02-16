@@ -332,8 +332,7 @@ function fetchData(url) {
                 throw new Error('Network response was not ok');
             }
             return response.text();
-        })
-        .then(text => parseXMLResponse(text));
+        });
 }
 
 // Function to populate dropdown with options
@@ -343,29 +342,31 @@ function populateDropdown(elementId, data) {
     // Loop through the data array and create an option element for each item
     data.forEach(function (item) {
         var option = document.createElement("option");
-        option.value = item;
-        option.textContent = item;
+        option.value = item.id; // Use the item's ID as the option value
+        option.textContent = item.name; // Use the item's name as the option text
         dropdown.appendChild(option);
     });
 }
 
 // Parse XML response
-function parseXMLResponse(xmlString) {
-    // Create a parser object
+function parseXMLResponse(xmlString, type) {
     const parser = new DOMParser();
-    // Parse XML into a document
-    const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-    // Get all "string" elements
-    const stringElements = xmlDoc.getElementsByTagName("string");
-    // Array to store topics
-    const topics = [];
-    // Extract text content from each string element
-    for (let i = 0; i < stringElements.length; i++) {
-        topics.push(stringElements[i].textContent);
+    const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+    let items = [];
+    let elements = xmlDoc.getElementsByTagName(type);
+
+    for (let i = 0; i < elements.length; i++) {
+        const id = elements[i].getElementsByTagName("Id")[0].textContent;
+        const text = elements[i].getElementsByTagName(type === "Topic" ? "Name" : "Text")[0].textContent;
+        items.push({ id: id, name: text });
     }
-    // Return topics array
-    return topics;
+    console.log(items);
+
+    return items;
 }
+
+
+
 
 // Suggestion submission code. The wrappers are needed to prevent the script from loading except on
 // feedback.html

@@ -42,25 +42,22 @@
     // Get the topic from the dropdown and fetch questions based on topic.
     // Changing this to use topic id instead of topic name would be far more elegant. See GetQuestions service.
     document.getElementById("topicSelect").addEventListener("change", function () {
-        var selectedTopic = this.value;
-        fetchData("ProjectServices.asmx/GetQuestions?topicName=" + selectedTopic)
-            .then(function (questions) {
-                populateDropdown("questionSelect", questions);
-            })
-            .catch(function (error) {
-                // Log an error message if fetching questions fails
-                console.error('Error fetching questions:', error);
-            });
+        var selectedTopicId = this.value;
+        fetchData(`ProjectServices.asmx/GetQuestions?topicId=${selectedTopicId}`)
+            .then(xmlString => parseXMLResponse(xmlString, "Question"))
+            .then(questions => populateDropdown("questionSelect", questions))
+            .catch(error => console.error('Error fetching questions:', error));
     });
+
+
 
     // Fetch topics and populate the topics dropdown
     fetchData("ProjectServices.asmx/GetTopics")
-        .then(function (topics) {
-            populateDropdown("topicSelect", topics);
-        })
-        .catch(function (error) {
-            console.error('Error fetching topics:', error);
-        });
+        .then(xmlString => parseXMLResponse(xmlString, "Topic"))
+        .then(topics => populateDropdown("topicSelect", topics))
+        .catch(error => console.error('Error fetching topics:', error));
+
+
 
 
     </script>
