@@ -605,5 +605,35 @@ namespace ProjectTemplate
             return ticketCount;
         }
 
+
+        //Function to submit suggestions to SQL DB
+        [WebMethod(EnableSession = true)]
+        public void SubmitSuggestion(string uid, int questionId, int topicId, string suggestionText)
+        {
+
+            string sqlConnectString = getConString();
+
+            // parameterized SQL query 
+
+            string sqlInsert = @"
+        INSERT INTO Suggestions (userid, questionid, topicid, Suggestiontext)
+        VALUES (@userid, @questionid, @topicid, @Suggestiontext);";
+
+            using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
+            {
+                using (MySqlCommand sqlCommand = new MySqlCommand(sqlInsert, sqlConnection))
+                {
+                    // Add parameters to avoid SQL injection
+                    sqlCommand.Parameters.AddWithValue("@userid", uid);
+                    sqlCommand.Parameters.AddWithValue("@questionid", questionId);
+                    sqlCommand.Parameters.AddWithValue("@topicid", topicId);
+                    sqlCommand.Parameters.AddWithValue("@Suggestiontext", suggestionText);
+
+                    sqlConnection.Open();
+                    sqlCommand.ExecuteNonQuery();
+
+                }
+            }
+        }
     }
 }
