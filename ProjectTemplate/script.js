@@ -109,7 +109,7 @@ function showNextCard() {
     logoPic.classList.remove('dismissing');
 }
 
-init();
+// init();
 
 
 //this function toggles which panel is showing, and also clears data from all panels
@@ -332,8 +332,7 @@ function fetchData(url) {
                 throw new Error('Network response was not ok');
             }
             return response.text();
-        })
-        .then(text => parseXMLResponse(text));
+        });
 }
 
 // Function to populate dropdown with options
@@ -343,45 +342,74 @@ function populateDropdown(elementId, data) {
     // Loop through the data array and create an option element for each item
     data.forEach(function (item) {
         var option = document.createElement("option");
-        option.value = item;
-        option.textContent = item;
+        option.value = item.id; // Use the item's ID as the option value
+        option.textContent = item.name; // Use the item's name as the option text
         dropdown.appendChild(option);
     });
 }
 
 // Parse XML response
-function parseXMLResponse(xmlString) {
-    // Create a parser object
+function parseXMLResponse(xmlString, type) {
     const parser = new DOMParser();
-    // Parse XML into a document
-    const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-    // Get all "string" elements
-    const stringElements = xmlDoc.getElementsByTagName("string");
-    // Array to store topics
-    const topics = [];
-    // Extract text content from each string element
-    for (let i = 0; i < stringElements.length; i++) {
-        topics.push(stringElements[i].textContent);
+    const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+    let items = [];
+    let elements = xmlDoc.getElementsByTagName(type);
+
+    for (let i = 0; i < elements.length; i++) {
+        const id = elements[i].getElementsByTagName("Id")[0].textContent;
+        const text = elements[i].getElementsByTagName(type === "Topic" ? "Name" : "Text")[0].textContent;
+        items.push({ id: id, name: text });
     }
-    // Return topics array
-    return topics;
+    console.log(items);
+
+    return items;
 }
 
 
-// Get the topic from the dropdown and fetch questions based on topic. 
-// Changing this to use topic id instead of topic name would be far more elegant. See GetQuestions service. 
-document.getElementById("topicSelect").addEventListener("change", function () {
-    var selectedTopic = this.value;
-    fetchData("ProjectServices.asmx/GetQuestions?topicName=" + selectedTopic) 
-        .then(function (questions) {
-            populateDropdown("questionSelect", questions);
-        })
-        .catch(function (error) {
-            // Log an error message if fetching questions fails
-            console.error('Error fetching questions:', error);
-        });
-    
+
+
+// Suggestion submission code. The wrappers are needed to prevent the script from loading except on
+// feedback.html
+document.addEventListener('DOMContentLoaded', function () {
+    var submitButton = document.getElementById('submitFeedback');
+    if (submitButton) {
+        submitButton.addEventListener('click', function (event) {
+            event.preventDefault(); 
+
+            // Capture user inputs
+            var userId = "5"; // This needs to be dynamically set based on the logged-in user
+            var topicId = document.getElementById("topicSelect").value;
+            var questionId = document.getElementById("questionSelect").value;
+            var suggestionText = document.getElementById("feedbackValue").value;
+
+            // Construct the parameters string for the AJAX call
+            var parameters = JSON.stringify({
+                uid: userId,
+                questionId: questionId,
+                topicId: topicId,
+                suggestionText: suggestionText
+            });
+
+            // Make the AJAX call to your web service
+            $.ajax({
+                type: "POST",
+                url: "ProjectServices.asmx/SubmitSuggestion",
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    alert("Suggestion submitted successfully!");
+                },
+                error: function (error) {
+                    console.error("Error submitting suggestion:", error);
+                    alert("Error submitting suggestion.");
+                }
+            });
+        });     //JavaScript isn't fun :(
+    }
 });
+
+
 //end of feedback js code
 
 

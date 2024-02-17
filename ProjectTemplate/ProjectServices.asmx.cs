@@ -326,16 +326,16 @@ namespace ProjectTemplate
 
 
 
-        // Pull topics dynamically from the database
+        // Pull topics and TopicID dynamically from the database
         [WebMethod(EnableSession = true)]
-        public List<string> GetTopics()
+        public List<Topic> GetTopics()
         {
-            List<string> topics = new List<string>();
+            List<Topic> topics = new List<Topic>();
             string connectionString = getConString();
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                string sqlQuery = "SELECT TopicName FROM Topics";
+                string sqlQuery = "SELECT idTopics, TopicName FROM Topics";
 
                 using (MySqlCommand command = new MySqlCommand(sqlQuery, connection))
                 {
@@ -344,7 +344,13 @@ namespace ProjectTemplate
                     {
                         while (reader.Read())
                         {
-                            topics.Add(reader.GetString("TopicName"));
+                            // Create a new Topic object for each row and add it to the list
+                            Topic topic = new Topic
+                            {
+                                Id = reader.GetInt32("idTopics"),
+                                Name = reader.GetString("TopicName")
+                            };
+                            topics.Add(topic);
                         }
                     }
                 }
@@ -353,37 +359,57 @@ namespace ProjectTemplate
             return topics;
         }
 
+        // Topic class
+        public class Topic
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+
         // pull questions dynamically from the DB. Changing this to use topicId instead of TopicName is a good idea.
         [WebMethod(EnableSession = true)]
-        public List<string> GetQuestions(string topicName)
+        public List<Question> GetQuestions(int topicId)
         {
-            List<string> questions = new List<string>();
+            List<Question> questions = new List<Question>();
             string connectionString = getConString();
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                //SQL Query to Join 
+                //SQL Query
                 string sqlQuery = @"
-            SELECT q.Question 
-            FROM Questions q
-            JOIN Topics t ON q.idTopics = t.idTopics
-            WHERE t.TopicName = @TopicName";
+                        SELECT q.idQuestions, q.Question 
+                        FROM Questions q
+                        WHERE q.idTopics = @TopicId";
 
                 using (MySqlCommand command = new MySqlCommand(sqlQuery, connection))
                 {
-                    command.Parameters.AddWithValue("@TopicName", HttpUtility.UrlDecode(topicName));
+                    command.Parameters.AddWithValue("@TopicId", topicId);
                     connection.Open();
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            questions.Add(reader.GetString("Question"));
+
+                            Question question = new Question
+                            {
+                                Id = reader.GetInt32("idQuestions"),
+                                Text = reader.GetString("Question")
+                            };
+                            questions.Add(question);
                         }
                     }
                 }
             }
 
             return questions;
+        }
+
+        //Question class
+        public class Question
+        {
+            public int Id { get; set; }
+            public string Text { get; set; }
         }
 
 
@@ -605,5 +631,35 @@ namespace ProjectTemplate
             return ticketCount;
         }
 
+
+        //Function to submit suggestions to SQL DB
+        [WebMethod(EnableSession = true)]
+        public void SubmitSuggestion(string uid, int questionId, int topicId, string suggestionText)
+        {
+
+            string sqlConnectString = getConString();
+
+            // parameterized SQL query 
+
+            string sqlInsert = @"
+        INSERT INTO Suggestions (userid, questionid, topicid, Suggestiontext)
+        VALUES (@userid, @questionid, @topicid, @Suggestiontext);";
+
+            using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
+            {
+                using (MySqlCommand sqlCommand = new MySqlCommand(sqlInsert, sqlConnection))
+                {
+                    // Add parameters to avoid SQL injection
+                    sqlCommand.Parameters.AddWithValue("@userid", uid);
+                    sqlCommand.Parameters.AddWithValue("@questionid", questionId);
+                    sqlCommand.Parameters.AddWithValue("@topicid", topicId);
+                    sqlCommand.Parameters.AddWithValue("@Suggestiontext", suggestionText);
+
+                    sqlConnection.Open();
+                    sqlCommand.ExecuteNonQuery();
+
+                }
+            }
+        }
     }
 }
