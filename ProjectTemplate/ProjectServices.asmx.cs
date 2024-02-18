@@ -661,5 +661,32 @@ namespace ProjectTemplate
                 }
             }
         }
+        public int GetLikes(string userid)
+        {
+            string sqlConnectString = getConString();
+            string sqlUpdate = "SELECT likes FROM Suggestions WHERE userid = @userid";
+            int likesCount = 0;
+
+            using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
+            {
+                using (MySqlCommand sqlCommand = new MySqlCommand(sqlUpdate, sqlConnection))
+                {
+                    sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+
+                    try
+                    {
+                        sqlConnection.Open();
+                        likesCount = Convert.ToInt32(sqlCommand.ExecuteScalar());
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        likesCount = -1;
+                        Console.WriteLine("Error: " + ex.Message);
+
+                    }
+                }
+            }return likesCount;
+        }
     }
 }

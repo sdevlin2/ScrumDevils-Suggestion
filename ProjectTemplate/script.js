@@ -247,14 +247,27 @@ function suggestionInput() {
     //showPanel('suggestionPage');
 }
 
-function pointCounter() {
+function pointCounter(userid) {
 
-
-    pointTotal++;
+    $.ajax({
+        url: "ProjectServices.asmx/GetLikes",
+        type: "GET",
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        data: JSON.stringify({ userid: userid }),
+        success: function (response) {
+            var points = parseInt(response.d);
+            document.getElementById('numberCounter').innerHTML = points;
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching points:", error);
+        }
+    });
+    /*pointTotal++;
 
     document.getElementById('numberCounter').innerHTML = pointTotal;
-
-    console.log(pointTotal);
+    
+    console.log(pointTotal);*/
 }
 
 // Allows the user to go back to main content page
