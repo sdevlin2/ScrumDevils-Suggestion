@@ -7,6 +7,10 @@ let offsetY;
 let isDragging = false;
 let isManager = false;
 let logoPic;
+let swipeCounter = 0;
+let dislikeCounter = 0;
+const maxDislikeCount = 5;
+let currentSuggestionIndex = 0;
 
 
 
@@ -14,8 +18,8 @@ let logoPic;
 const init = () => {
 
 
-    logoPic = document.getElementById('logoPic');// Need to change to show Topics, Questions and Suggestions
-
+    /*logoPic = document.getElementById('#suggestionBox');*/
+    logoPic = document.querySelector('.suggestionBox');
 
     const handleMouseMove = (e) => {
         e.preventDefault();
@@ -25,10 +29,6 @@ const init = () => {
         offsetY = clientY - startPoint.y;
         logoPic.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
     };
-
-    logoPic.addEventListener('dragstart', e => {
-        e.preventDefault();
-    })
 
     const handleMouseUp = () => {
         if (!isDragging) return;
@@ -69,17 +69,42 @@ const init = () => {
 
 
     listenToMouseEvents();
+
+    LoadSuggestion()
 };
 
 function handleSwipe(liked) {
     if (liked) {
         console.log("Liked!");
+
+        var topicValue = document.getElementById('topics').textContent;
+        var questionsValue = document.getElementById('questions').textContent;
+        var suggestionsValue = document.getElementById('suggestions').textContent;
+
+        // Perform further actions with captured values if needed
+        console.log("Topic:", topicValue);
+        console.log("Questions:", questionsValue);
+        console.log("Suggestions:", suggestionsValue);
+
+
         animateSwipe('right');
 
     } else {
         console.log("Disliked!");
-        animateSwipe('left');
+        dislikeCounter++;
+        if (dislikeCounter >= maxDislikeCount) {
+            console.log("Card disliked too many times, deleting...");
+            deleteCard();
+        } else {
+            animateSwipe('left');
+        }
     }
+}
+
+function deleteCard() {
+    // Perform actions to delete the card, e.g., remove it from the DOM or hide it.
+    console.log("Deleting card...");
+    // Add your deletion logic here
 }
 
 
@@ -89,10 +114,17 @@ function animateSwipe(direction) {
     logoPic.style.transform = `translate(${direction * window.innerWidth}px, ${offsetY}px) rotate(${90 * direction}deg)`;
     logoPic.style.opacity = 0;
     logoPic.classList.add('dismissing');
-    setTimeout(() => {
 
-        showNextCard();
-    }, 1000);
+    
+        setTimeout(() => {
+            currentSuggestionIndex++;
+            LoadSuggestion();
+            resetLogoPic();
+            showNextCard();
+            logoPic.classList.remove('dismissing')
+        }, 1000);
+
+    
 }
 
 function resetLogoPic() {
@@ -109,7 +141,8 @@ function showNextCard() {
     logoPic.classList.remove('dismissing');
 }
 
-// init();
+
+init();
 
 
 //this function toggles which panel is showing, and also clears data from all panels
@@ -193,13 +226,13 @@ function logon() {
                 } else {
                     document.getElementById('managerView').style.display = 'none';
                 }
-
+                document.getElementById("usernameShow").innerHTML = id;
             }
         },
         error: function (e) {
             alert("this code will only execute if javascript is unable to access the webservice");
             showPanel('accountsPanel'); //CHANGE WHEN DB IS UP
-            document.getElementById("usernameShow").innerHTML = id;
+            
         }
     });
 }
@@ -234,6 +267,7 @@ function leaderBoard() {
 
 function match() {
     showPanel('matchingPage');
+    
 
 }
 
@@ -382,6 +416,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var questionId = document.getElementById("questionSelect").value;
             var suggestionText = document.getElementById("feedbackValue").value;
 
+
+           
+
             // Construct the parameters string for the AJAX call
             var parameters = JSON.stringify({
                 uid: userId,
@@ -439,6 +476,70 @@ function ticketManager() {
         }
     });
 }
+
+
+function LoadSuggestion() {
+
+    $.ajax({
+        type: "POST",
+        url: "ProjectServices.asmx/GetSuggestions",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (msg) {
+            console.log("pass");
+            var suggestions = msg.d;
+
+            var topicElement = document.getElementById("topics");
+            var questionsElement = document.getElementById("questions");
+            var suggestionsElement = document.getElementById("suggestions");
+
+            // Clear existing content
+            topicElement.innerHTML = "";
+            questionsElement.innerHTML = "";
+            suggestionsElement.innerHTML = "";
+
+            // Populate HTML elements with suggestion data
+            if (suggestions.length > 0) {
+                var suggestion = suggestions[currentSuggestionIndex];
+
+                // Populate HTML elements with suggestion data
+                document.getElementById("topics").innerHTML = "<label>Topic</label><p>" + suggestion.TopicId + "</p>";
+                document.getElementById("questions").innerHTML = "<label>Questions</label><p>" + suggestion.QuestionId + "</p>";
+                document.getElementById("suggestions").innerHTML = "<p>" + suggestion.SuggestionText + "</p>";
+            }
+        },
+        error: function (e) {
+            alert("Error fetching suggestions");
+        }
+    });
+}
+
+
+
+/*function deleteSuggestion() {
+    var webMethod = "ProjectServices.asmx/DeleteSuggestion";
+    var parameters = "{\"uid\":\"" + encodeURI(id) + "\"}";
+
+    $.ajax({
+        type: "POST",
+        url: webMethod,
+        data: parameters,
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (msg) {
+            console.log("pass");
+            var tickets = msg.d
+
+            
+
+        },
+        error: function (e) {
+            alert("Error fetching tickets");
+        }
+    });
+
+}*/
+
 
 
 

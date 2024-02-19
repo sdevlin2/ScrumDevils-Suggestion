@@ -8,6 +8,8 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
+using System.Security.Principal;
+using System.Runtime.Remoting.Messaging;
 
 namespace ProjectTemplate
 {
@@ -106,7 +108,7 @@ namespace ProjectTemplate
             if (sqlDt.Rows.Count > 0)
             {
                 //flip our flag to true so we return a value that lets them know they're logged in
-                
+
                 success = true;
             }
             //return the result!
@@ -566,7 +568,7 @@ namespace ProjectTemplate
             return suggestionCount;
         }
 
-  
+
         //When a new user is created a slot is generated in the Ticket table starting them off at zero tickets
         private void UpdateTotalTicketCount(string uid, int ticketCount)
         {
@@ -578,7 +580,7 @@ namespace ProjectTemplate
             MySqlCommand sqlCommand = new MySqlCommand(sqlUpdate, sqlConnection);
 
             sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(uid));
-            sqlCommand.Parameters.AddWithValue("@ticketsValue",ticketCount);
+            sqlCommand.Parameters.AddWithValue("@ticketsValue", ticketCount);
 
             sqlConnection.Open();
             //we're using a try/catch so that if the query errors out we can handle it gracefully
@@ -586,7 +588,7 @@ namespace ProjectTemplate
             try
             {
                 int accountID = Convert.ToInt32(sqlCommand.ExecuteScalar());
-                
+
             }
             catch (Exception e)
             {
@@ -660,6 +662,48 @@ namespace ProjectTemplate
 
                 }
             }
+        }
+        [WebMethod(EnableSession = true)]
+        public Suggestions[] GetSuggestions()
+        {
+            DataTable sqlDt = new DataTable("uggestions");
+            string connectionString = getConString();
+
+            string sqlSelect = @"
+                SELECT t.TopicName, q.Question, s.Suggestiontext
+                FROM Topics t 
+                JOIN Suggestions s ON t.idTopics = s.topicid
+                JOIN Questions q ON s.questionid = q.idQuestions;";
+
+            MySqlConnection sqlConnection = new MySqlConnection(connectionString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+
+            List<Suggestions> suggestions = new List<Suggestions>();
+
+            // Loop through each row in the DataTable and create Suggestions objects
+            for (int i = 0; i < sqlDt.Rows.Count; i++)
+            {
+                suggestions.Add(new Suggestions
+                {
+                    TopicId = sqlDt.Rows[i]["TopicName"].ToString(),
+                    QuestionId = sqlDt.Rows[i]["Question"].ToString(),
+                    SuggestionText = sqlDt.Rows[i]["Suggestiontext"].ToString(),
+                });
+            }
+
+            // Convert the list of suggestions to an array and return
+            return suggestions.ToArray();
+        }
+
+      
+        public class Suggestions
+        {
+            public string TopicId { get; set; }
+            public string QuestionId { get; set; }
+            public string SuggestionText { get; set; }
         }
     }
 }
