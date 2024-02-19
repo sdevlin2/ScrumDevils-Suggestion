@@ -666,7 +666,7 @@ namespace ProjectTemplate
         [WebMethod(EnableSession = true)]
         public Suggestions[] GetSuggestions()
         {
-            DataTable sqlDt = new DataTable("uggestions");
+            DataTable sqlDt = new DataTable("Suggestions");
             string connectionString = getConString();
 
             string sqlSelect = @"
