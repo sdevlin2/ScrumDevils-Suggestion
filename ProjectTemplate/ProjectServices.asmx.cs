@@ -33,7 +33,7 @@ namespace ProjectTemplate
         ////////////////////////////////////////////////////////////////////////
         private string getConString()
         {
-            return "SERVER=107.180.1.16; PORT=3306; DATABASE=" + dbName + "; UID=" + dbID + "; PASSWORD=" + dbPass + "; CharSet=utf8mb4;";
+            return "SERVER=107.180.1.16; PORT=3306; DATABASE=" + dbName + "; UID=" + dbID + "; PASSWORD=" + dbPass;
         }
         ////////////////////////////////////////////////////////////////////////
 
