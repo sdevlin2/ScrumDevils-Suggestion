@@ -142,7 +142,6 @@ function showNextCard() {
 }
 
 
-init();
 
 
 //this function toggles which panel is showing, and also clears data from all panels
