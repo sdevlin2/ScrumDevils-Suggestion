@@ -7,65 +7,53 @@ body {
     height: 100vh;
     width: 100vw;
     margin: 0px;
-    position:relative;
+    position: relative;
 }
-
 
 .login-container {
     background-color: white;
     padding: 30px;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
-            
-
-    max-width: 450px;
+    max-width: 450px; /* Adjusted max-width */
     text-align: center; /* Centering content */
     font-size: 18px;
-
 }
 
-.login-container img {
-    max-width: 120px;
-    height: auto; 
-    margin-bottom: 20px; 
-}
+    .login-container img {
+        max-width: 120px;
+        height: auto;
+        margin-bottom: 20px;
+    }
 
-.login-container input,
-.login-container button {
-    margin: 20px 0; 
-}
+    .login-container input,
+    .login-container button {
+        width: 100%;
+        padding: 15px;
+        margin: 15px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
 
-.login-container input,
-.login-container button {
-    width: 100%;
-    padding: 15px;
-    margin: 15px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
+    .login-container button {
+        background-color: #0056b3;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
 
-.login-container button {
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-.login-container button:hover {
-    background-color: #004494;
-}
+        .login-container button:hover {
+            background-color: #004494;
+        }
 
 #loginMessage {
     text-align: center;
     margin-top: 10px;
 }
 
-
-/*New CSS for main content page*/
-
+/* New CSS for main content page */
 .content {
     display: flex;
     flex-direction: column;
@@ -74,79 +62,73 @@ body {
     margin: 0;
 }
 
-
-
 .mainPage {
     background-color: white;
     height: 100vh;
     width: 100vw;
     position: absolute;
     visibility: hidden;
-    right:  0px;
+    right: 0px;
     bottom: 0px;
 }
 
-.mainPage #newAccount #manager {
-    text-align: center; /* Center the content within newAccount */
-}
+    .mainPage #newAccount #manager {
+        text-align: center; /* Center the content within newAccount */
+    }
 
-.mainPage #newAccount input {
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-
-}
+    .mainPage #newAccount input {
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
 
 .accountContainer {
-
     background-color: white;
     padding: 30px;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     margin: auto;
     font-size: 18px;
     margin-top: 100px;
-           
-            
 }
 
-.accountContainer input{
-    width:100%;
-    clear: both;
-    flex: 1;
-    text-align:center;
-}
+    .accountContainer input {
+        width: 100%;
+        clear: both;
+        flex: 1;
+        text-align: center;
+    }
 
-.accountContainer button {
-    width: 100%; /* Set button width to 100% */
-    padding: 15px;
-    margin: 15px 0;
-    border: none;
-    border-radius: 4px;
-    box-sizing: border-box;
-    background-color: #0056b3;
-    color: white;
-    cursor: pointer;
-}
+    .accountContainer button {
+        width: 100%; /* Set button width to 100% */
+        padding: 15px;
+        margin: 15px 0;
+        border: none;
+        border-radius: 4px;
+        box-sizing: border-box;
+        background-color: #0056b3;
+        color: white;
+        cursor: pointer;
+    }
 
-.accountContainer button:hover {
-    background-color: #004494;
-}
+        .accountContainer button:hover {
+            background-color: #004494;
+        }
 
 .suggestionBox {
     background-color: white;
     padding: 30px;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     margin: auto;
     font-size: 18px;
     margin-top: 100px;
 }
-           
+
 .content button {
     width: 200px;
     padding: 20px;
@@ -163,7 +145,7 @@ body {
     height: 35vh;
 }
 
-.button-alert{
+.button-alert {
     margin: 6px;
     padding: 6px 12px;
     border-radius: 10px;
@@ -174,14 +156,12 @@ body {
     padding: 20px;
     text-align: right;
     flex: 1;
+    color: white; /* Make all text in the header white */
 }
+
     .header a {
-       
-        text-align: right;
         color: #bbbbbb;
     }
-  
-
 
 .profile-icon {
     width: 60px;
@@ -189,6 +169,7 @@ body {
     background-color: #ddd;
     border-radius: 50%;
     margin-right: 10px;
+    border: 2px solid white;
 }
 
 .button-swipe {
@@ -201,57 +182,49 @@ body {
     box-sizing: border-box;
 }
 
-/*feedback page*/
+/* Feedback page */
 .feedback-container {
     background-color: white;
     padding: 20px;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 600px;
     height: 75vh;
     max-height: 800px;
 }
 
-.feedback-container textarea {
-    width: 100%;
-    height: 50vh;
-}
+    .feedback-container textarea {
+        width: 100%;
+        height: 50vh;
+    }
 
-.feedback-container h1 {
-    text-align: center;
-}
+    .feedback-container h1 {
+        text-align: center;
+    }
 
-.feedback-container select, .feedback-container textarea, .feedback-container input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
+    .feedback-container select,
+    .feedback-container textarea,
+    .feedback-container input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
 
-.feedback-container input[type="submit"] {
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
+        .feedback-container input[type="submit"] {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-.feedback-container input[type="submit"]:hover {
-    background-color: #004494;
-}
-
-#topic {
-    font-size: 200%;
-}
-
-#question {
-    font-size: 150%;
-}
-/*end of feedback page*/
-
+            .feedback-container input[type="submit"]:hover {
+                background-color: #004494;
+            }
 
 #draggableObject {
     width: 100px;
@@ -272,14 +245,16 @@ body {
     display: none;
 }
 
-#accountName{
-    position:fixed;
-    top: 90px;
-    left:50px;
+#accountName {
+    position: fixed;
+    top: 20px;
+    left: 100px; /* Moved slightly more to the right for better alignment */
+    color: white; /* Make the text white */
 }
 
-#pointCounter{
-    position:fixed;
-    top: 90px;
-    right:50px;
+#pointCounter {
+    position: fixed;
+    top: 20px;
+    right: 30px; /* Moved slightly more to the right for better positioning */
+    color: white; /* Make the text white */
 }
