@@ -199,6 +199,9 @@ function logon() {
 
                 var isManager = responseFromServer.isManager;
 
+                currentUser = id; 
+                localStorage.setItem('currentUser', id);
+
                 // Show the main content panel
                 showPanel('accountsPanel');
 
@@ -213,7 +216,6 @@ function logon() {
         },
         error: function (e) {
             alert("this code will only execute if javascript is unable to access the webservice");
-            showPanel('accountsPanel'); //CHANGE WHEN DB IS UP
 
         }
     });
@@ -327,6 +329,8 @@ function LogOff() {
                 //we logged off, so go back to logon page,
                 //stop checking messages
                 //and clear the chat panel
+                currentUser = null;
+                localStorage.removeItem('currentUser');
                 showPanel('logonPanel');
 
             }
