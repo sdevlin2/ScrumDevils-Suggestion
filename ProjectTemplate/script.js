@@ -5,20 +5,16 @@ let startPoint;
 let offsetX;
 let offsetY;
 let isDragging = false;
-let isManager = false;
 let logoPic;
 let swipeCounter = 0;
-let dislikeCounter = 0;
-const maxDislikeCount = 5;
 let currentSuggestionIndex = 0;
+
 
 
 
 // initialzing the Swipe function for matching page
 const init = () => {
 
-
-    /*logoPic = document.getElementById('#suggestionBox');*/
     logoPic = document.querySelector('.suggestionBox');
 
     const handleMouseMove = (e) => {
@@ -70,42 +66,26 @@ const init = () => {
 
     listenToMouseEvents();
 
-    LoadSuggestion()
+    LoadSuggestion();
 };
 
 function handleSwipe(liked) {
+    var Suggestiontext = document.getElementById('suggestions').textContent;
     if (liked) {
-        console.log("Liked!");
-
-        var topicValue = document.getElementById('topics').textContent;
-        var questionsValue = document.getElementById('questions').textContent;
-        var suggestionsValue = document.getElementById('suggestions').textContent;
-
-        // Perform further actions with captured values if needed
-        console.log("Topic:", topicValue);
-        console.log("Questions:", questionsValue);
-        console.log("Suggestions:", suggestionsValue);
-
-
+   
         animateSwipe('right');
-
+        console.log("like");
+        //call and update the Likes of the suggestion
+        likeOrDislike(Suggestiontext, true);
     } else {
-        console.log("Disliked!");
-        dislikeCounter++;
-        if (dislikeCounter >= maxDislikeCount) {
-            console.log("Card disliked too many times, deleting...");
-            deleteCard();
-        } else {
-            animateSwipe('left');
-        }
+        console.log("dislike");
+        animateSwipe('left');
+        //call and update the dislikes of the suggestion
+        likeOrDislike(Suggestiontext, false);
     }
 }
 
-function deleteCard() {
-    // Perform actions to delete the card, e.g., remove it from the DOM or hide it.
-    console.log("Deleting card...");
-    // Add your deletion logic here
-}
+
 
 
 // animation for when button agree or skip is clicked to move Suggestions
@@ -127,22 +107,20 @@ function animateSwipe(direction) {
     
 }
 
+//Resets the suggestion back to the original spot once moved
 function resetLogoPic() {
 
     logoPic.style.transform = 'translateX(0)';
     logoPic.style.opacity = 1;
 }
 
-//function to move onto next auggestion Topic
+//function to move onto next suggestion Topic
 function showNextCard() {
 
     console.log("Showing the next card...");
     resetLogoPic(); // Reset the logoPic position for the next card
     logoPic.classList.remove('dismissing');
 }
-
-
-init();
 
 
 //this function toggles which panel is showing, and also clears data from all panels
@@ -159,8 +137,6 @@ function showPanel(panelId) {
 
    
 }
-
-
 
 jQuery(function () {
     //when the app loads, show the logon panel to start with!
@@ -214,8 +190,6 @@ function logon() {
         success: function (msg) {
             var responseFromServer = msg.d;
             if (responseFromServer == true) {
-
-                var isManager = responseFromServer.isManager;
 
                 // Show the main content panel
                 showPanel('accountsPanel');
@@ -463,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
 //end of feedback js code
 
 
-
+//Displays the amount of tickets each user has when username input received
 function ticketManager() {
     var id = document.getElementById('userid').value;
     var webMethod = "ProjectServices.asmx/TotalTicketCount";
@@ -490,7 +464,7 @@ function ticketManager() {
     });
 }
 
-
+//Displays suggestion on matching page
 function LoadSuggestion() {
 
     $.ajax({
@@ -527,11 +501,36 @@ function LoadSuggestion() {
     });
 }
 
+//increments function for likes and dislikes
+function likeOrDislike(Suggestiontext, isLike) {
+    var webMethod = "ProjectServices.asmx/LikenDislikeSuggestion";
+    var parameters = {
+        Suggestiontext: Suggestiontext,
+        isLike: isLike
+    };
+    $.ajax({
+        type: "POST",
+        url: webMethod,
+        data: JSON.stringify(parameters),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (msg) {
+
+           
+
+        },
+        error: function (e) {
+           
+        }
+    });
+}
 
 
-/*function deleteSuggestion() {
+
+function deleteSuggestion(Suggestiontext) {
+    /*var Suggestiontext = document.getElementById('suggestions').textContent;*/
     var webMethod = "ProjectServices.asmx/DeleteSuggestion";
-    var parameters = "{\"uid\":\"" + encodeURI(id) + "\"}";
+    var parameters = "{\"Suggestiontext\":\"" + encodeURI(Suggestiontext) + "\"}";
 
     $.ajax({
         type: "POST",
@@ -540,18 +539,16 @@ function LoadSuggestion() {
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (msg) {
-            console.log("pass");
-            var tickets = msg.d
-
+            console.log("deleted...");
             
-
+            
         },
         error: function (e) {
-            alert("Error fetching tickets");
+            alert("boo...");
         }
     });
 
-}*/
+}
 
 
 

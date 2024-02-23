@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Runtime.Remoting.Messaging;
+using System.ComponentModel;
 
 namespace ProjectTemplate
 {
@@ -33,7 +34,7 @@ namespace ProjectTemplate
         ////////////////////////////////////////////////////////////////////////
         private string getConString()
         {
-            return "SERVER=107.180.1.16; PORT=3306; DATABASE=" + dbName + "; UID=" + dbID + "; PASSWORD=" + dbPass;
+            return "SERVER=107.180.1.16; PORT=3306; DATABASE=" + dbName + "; UID=" + dbID + "; PASSWORD=" + dbPass + "; CharSet=utf8mb4;";
         }
         ////////////////////////////////////////////////////////////////////////
 
@@ -569,7 +570,7 @@ namespace ProjectTemplate
         }
 
 
-        //When a new user is created a slot is generated in the Ticket table starting them off at zero tickets
+        //Update the amount of tickets a person has to the SQL table
         private void UpdateTotalTicketCount(string uid, int ticketCount)
         {
             //inserts new user information into table
@@ -583,8 +584,7 @@ namespace ProjectTemplate
             sqlCommand.Parameters.AddWithValue("@ticketsValue", ticketCount);
 
             sqlConnection.Open();
-            //we're using a try/catch so that if the query errors out we can handle it gracefully
-            //by closing the connection and moving on
+           
             try
             {
                 int accountID = Convert.ToInt32(sqlCommand.ExecuteScalar());
@@ -614,11 +614,10 @@ namespace ProjectTemplate
                 {
                     sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(uid));
 
-                    // Open the connection and execute the query
                     try
                     {
                         sqlConnection.Open();
-                        // ExecuteScalar returns the first column of the first row in the resultset
+                        
                         ticketCount = Convert.ToInt32(sqlCommand.ExecuteScalar());
                     }
                     catch (Exception e)
@@ -698,7 +697,36 @@ namespace ProjectTemplate
             return suggestions.ToArray();
         }
 
-      
+        //enables user to delete data from Suggestions table
+        [WebMethod(EnableSession = true)]
+        public void DeleteSuggestion(string Suggestiontext)
+        {
+           
+
+            string sqlConnectString = getConString();
+            
+            string sqlSelect = "delete from Suggestions where Suggestiontext=@SuggestiontextValue AND dislikes > 6";
+
+                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+                sqlCommand.Parameters.AddWithValue("@SuggestiontextValue", HttpUtility.UrlDecode(Suggestiontext));
+
+                sqlConnection.Open();
+                try
+                {
+                    sqlCommand.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                }
+                sqlConnection.Close();
+            
+        }
+
+
+
+
         public class Suggestions
         {
             public string TopicId { get; set; }
@@ -732,5 +760,36 @@ namespace ProjectTemplate
                 }
             }return likesCount;
         }
+
+
+        [WebMethod(EnableSession = true)]
+        public void LikenDislikeSuggestion( string Suggestiontext, bool isLike) 
+        {
+            
+            string sqlConnectString = getConString();
+            string columnToUpdate = isLike ? "likes" : "dislikes";
+            string sqlUpdate = $"UPDATE Suggestions SET {columnToUpdate} = {columnToUpdate} + 1 WHERE Suggestiontext = @SuggestiontextValue";
+
+
+            using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
+            {
+                using (MySqlCommand sqlCommand = new MySqlCommand(sqlUpdate, sqlConnection))
+                {
+                    
+                    sqlCommand.Parameters.AddWithValue("@SuggestiontextValue", Suggestiontext);
+
+                    try
+                    {
+                        sqlConnection.Open();
+                        sqlCommand.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error: " + ex.Message);
+                    }
+                }
+            }
+        }
+    
     }
 }
