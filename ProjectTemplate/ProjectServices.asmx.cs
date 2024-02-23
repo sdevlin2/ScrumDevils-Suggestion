@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Services;
-using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Data;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Cryptography;
-using System.Security.Principal;
-using System.Runtime.Remoting.Messaging;
-using System.ComponentModel;
 
 namespace ProjectTemplate
 {
