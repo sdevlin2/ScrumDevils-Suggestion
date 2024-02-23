@@ -77,12 +77,14 @@ const init = () => {
 function handleSwipe(liked) {
     var Suggestiontext = document.getElementById('suggestions').textContent;
     if (liked) {
-
+        console.log("like");
         animateSwipe('right');
+        //call and update the Likes of the suggestion
         likeOrDislike(Suggestiontext, true);
     } else {
-
+        console.log("dislike");
         animateSwipe('left');
+        //call and update the dislikes of the suggestion
         likeOrDislike(Suggestiontext, false);
     }
 }
@@ -122,6 +124,7 @@ function showNextCard() {
     resetLogoPic(); // Reset the logoPic position for the next card
     logoPic.classList.remove('dismissing');
 }
+
 
 
 //this function toggles which panel is showing, and also clears data from all panels
@@ -214,6 +217,16 @@ function logon() {
 
         }
     });
+}
+
+function updateUsernameDisplay() {
+    var storedUsername = localStorage.getItem('currentUser');
+    if (storedUsername) {
+        document.getElementById("usernameShow").textContent = storedUsername;
+    } else {
+        // Handle the case where there is no username stored, e.g., user not logged in
+        document.getElementById("usernameShow").textContent = "Not logged in";
+    }
 }
 
 function CreateAccount() {
