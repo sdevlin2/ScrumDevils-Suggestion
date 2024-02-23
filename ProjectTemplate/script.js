@@ -8,7 +8,8 @@ let isDragging = false;
 let logoPic;
 let swipeCounter = 0;
 let currentSuggestionIndex = 0;
-
+var currentUser = null;
+var storedUsername = localStorage.getItem('currentUser');
 
 
 
@@ -123,6 +124,9 @@ function showNextCard() {
 }
 
 
+init();
+
+
 //this function toggles which panel is showing, and also clears data from all panels
 function showPanel(panelId) {
     clearLogon();
@@ -180,6 +184,7 @@ function logon() {
     var pass = document.getElementById("logonPass").value;
     var webMethod = "ProjectServices.asmx/LogOn";
     var parameters = "{\"uid\":\"" + encodeURI(id) + "\", \"pass\":\"" + encodeURI(pass) + "\"}";
+    var id = document.getElementById("logonID").value;
 
     $.ajax({
         type: "POST",
@@ -190,6 +195,8 @@ function logon() {
         success: function (msg) {
             var responseFromServer = msg.d;
             if (responseFromServer == true) {
+
+                var isManager = responseFromServer.isManager;
 
                 // Show the main content panel
                 showPanel('accountsPanel');
@@ -205,12 +212,21 @@ function logon() {
         },
         error: function (e) {
             alert("this code will only execute if javascript is unable to access the webservice");
-            showPanel('accountsPanel'); //CHANGE WHEN DB IS UP
             
         }
     });
 }
 
+
+function updateUsernameDisplay() {
+    var storedUsername = localStorage.getItem('currentUser');
+    if (storedUsername) {
+        document.getElementById("usernameShow").textContent = storedUsername;
+    } else {
+        // Handle the case where there is no username stored, e.g., user not logged in
+        document.getElementById("usernameShow").textContent = "Not logged in";
+    }
+}
 function CreateAccount() {
     var id = document.getElementById("newId").value;
     var pass = document.getElementById("newPassword").value;

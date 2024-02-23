@@ -9,7 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    
+
 </head>
 
 <body>
@@ -128,13 +128,34 @@
 
 
     </div>
-    <script src="script.js"></script>
-    <script type="text/javascript">
-
-        init();
-    </script>
 </body>
-
 </html>
+<script src="script.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        init();
+    });
+
+    $(document).ready(function () {
+        function navigateToPanelFromHash() {
+            var hash = window.location.hash.replace('#', '');
+            if (contentPanels.includes(hash)) {
+                showPanel(hash);
+                if (hash === 'accountsPanel') {
+                    updateUsernameDisplay();
+                }
+            } else {
+                showPanel('logonPanel');
+            }
+        }
+
+        navigateToPanelFromHash(); // Call this function on page load
+
+    });
+
+
+
+</script>
 
 

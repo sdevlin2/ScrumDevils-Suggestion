@@ -7,7 +7,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <script src="script.js"></script>
 
 </head>
 <body>
@@ -30,6 +29,7 @@
             <div>
                 <textarea id="feedbackValue"></textarea>
                 <input type="submit" id="submitFeedback" value="Submit Feedback">
+                <input type="button" id="goBackButton" value="Go Back">
             </div>
 
             <a href="#" onclick="goBack()">Go Back</a>
@@ -39,10 +39,10 @@
 </body>
 </html>
 
-<script>
+<script src="script.js"></script>
+<script type="text/javascript">
 
     // Get the topic from the dropdown and fetch questions based on topic.
-    // Changing this to use topic id instead of topic name would be far more elegant. See GetQuestions service.
     document.getElementById("topicSelect").addEventListener("change", function () {
         var selectedTopicId = this.value;
         fetchData(`ProjectServices.asmx/GetQuestions?topicId=${selectedTopicId}`)
@@ -59,7 +59,12 @@
         .then(topics => populateDropdown("topicSelect", topics))
         .catch(error => console.error('Error fetching topics:', error));
 
+    $(document).ready(function () {
+        $('#goBackButton').click(function () {
+            window.location.href = 'index.html#accountsPanel';
+        });
+    });
 
 
 
-    </script>
+</script>
