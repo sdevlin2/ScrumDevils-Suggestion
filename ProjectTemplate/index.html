@@ -132,6 +132,26 @@
     <script type="text/javascript">
 
         init();
+
+
+        $(document).ready(function () {
+            // Function to navigate to the correct panel based on URL hash
+            function navigateToPanelFromHash() {
+                var hash = window.location.hash.replace('#', '');
+                if (contentPanels.includes(hash)) {
+                    showPanel(hash);
+                } else {
+                    // If there's no hash, or it doesn't match any panel ID, show a default panel
+                    // This could be the login panel or another appropriate default
+                    showPanel('logonPanel');
+                }
+            }
+
+            // Call this function on page load to check the hash and navigate accordingly
+            navigateToPanelFromHash();
+        });
+
+
     </script>
 </body>
 
