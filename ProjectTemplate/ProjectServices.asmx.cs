@@ -698,34 +698,7 @@ namespace ProjectTemplate
         }
 
         //enables user to delete data from Suggestions table
-        [WebMethod(EnableSession = true)]
-        public void DeleteSuggestion(string Suggestiontext)
-        {
-           
-
-            string sqlConnectString = getConString();
-            
-            string sqlSelect = "delete from Suggestions where Suggestiontext=@SuggestiontextValue AND dislikes > 6";
-
-                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
-                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
-
-                sqlCommand.Parameters.AddWithValue("@SuggestiontextValue", HttpUtility.UrlDecode(Suggestiontext));
-
-                sqlConnection.Open();
-                try
-                {
-                    sqlCommand.ExecuteNonQuery();
-                }
-                catch (Exception e)
-                {
-                }
-                sqlConnection.Close();
-            
-        }
-
-
-
+       
 
         public class Suggestions
         {
@@ -782,6 +755,12 @@ namespace ProjectTemplate
                     {
                         sqlConnection.Open();
                         sqlCommand.ExecuteNonQuery();
+
+                        if (!isLike)
+                        {
+                            // Call a method to check the dislike count and remove if necessary
+                            CheckAndRemoveSuggestionIfDisliked(Suggestiontext);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -790,6 +769,39 @@ namespace ProjectTemplate
                 }
             }
         }
-    
+
+        private void CheckAndRemoveSuggestionIfDisliked(string Suggestiontext)
+        {
+            string sqlSelect = "SELECT dislikes FROM Suggestions WHERE Suggestiontext = @SuggestiontextValue";
+            string sqlDelete = "DELETE FROM Suggestions WHERE Suggestiontext = @SuggestiontextValue";
+
+            using (MySqlConnection sqlConnection = new MySqlConnection(getConString()))
+            {
+                sqlConnection.Open();
+                int dislikes = 0;
+
+                // Get the current number of dislikes
+                using (MySqlCommand cmdSelect = new MySqlCommand(sqlSelect, sqlConnection))
+                {
+                    cmdSelect.Parameters.AddWithValue("@SuggestiontextValue", Suggestiontext);
+                    object result = cmdSelect.ExecuteScalar();
+                    if (result != null)
+                    {
+                        dislikes = Convert.ToInt32(result);
+                    }
+                }
+
+                // If dislikes reach 6, delete the suggestion
+                if (dislikes >= 6)
+                {
+                    using (MySqlCommand cmdDelete = new MySqlCommand(sqlDelete, sqlConnection))
+                    {
+                        cmdDelete.Parameters.AddWithValue("@SuggestiontextValue", Suggestiontext);
+                        cmdDelete.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
     }
 }

@@ -546,31 +546,3 @@ function likeOrDislike(Suggestiontext, isLike) {
 
 
 
-function deleteSuggestion(Suggestiontext) {
-    /*var Suggestiontext = document.getElementById('suggestions').textContent;*/
-    var webMethod = "ProjectServices.asmx/DeleteSuggestion";
-    var parameters = "{\"Suggestiontext\":\"" + encodeURI(Suggestiontext) + "\"}";
-
-    $.ajax({
-        type: "POST",
-        url: webMethod,
-        data: parameters,
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (msg) {
-            console.log("deleted...");
-
-
-        },
-        error: function (e) {
-            alert("boo...");
-        }
-    });
-
-}
-
-
-
-
-
-
