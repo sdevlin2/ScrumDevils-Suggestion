@@ -5,6 +5,7 @@ let startPoint;
 let offsetX;
 let offsetY;
 let isDragging = false;
+let isManager = false;
 let logoPic;
 let swipeCounter = 0;
 let currentSuggestionIndex = 0;
@@ -13,9 +14,12 @@ var storedUsername = localStorage.getItem('currentUser');
 
 
 
+
 // initialzing the Swipe function for matching page
 const init = () => {
 
+
+    /*logoPic = document.getElementById('#suggestionBox');*/
     logoPic = document.querySelector('.suggestionBox');
 
     const handleMouseMove = (e) => {
@@ -73,15 +77,12 @@ const init = () => {
 function handleSwipe(liked) {
     var Suggestiontext = document.getElementById('suggestions').textContent;
     if (liked) {
-   
+
         animateSwipe('right');
-        console.log("like");
-        //call and update the Likes of the suggestion
         likeOrDislike(Suggestiontext, true);
     } else {
-        console.log("dislike");
+
         animateSwipe('left');
-        //call and update the dislikes of the suggestion
         likeOrDislike(Suggestiontext, false);
     }
 }
@@ -96,35 +97,31 @@ function animateSwipe(direction) {
     logoPic.style.opacity = 0;
     logoPic.classList.add('dismissing');
 
-    
-        setTimeout(() => {
-            currentSuggestionIndex++;
-            LoadSuggestion();
-            resetLogoPic();
-            showNextCard();
-            logoPic.classList.remove('dismissing')
-        }, 1000);
 
-    
+    setTimeout(() => {
+        currentSuggestionIndex++;
+        LoadSuggestion();
+        resetLogoPic();
+        showNextCard();
+        logoPic.classList.remove('dismissing')
+    }, 1000);
+
+
 }
 
-//Resets the suggestion back to the original spot once moved
 function resetLogoPic() {
 
     logoPic.style.transform = 'translateX(0)';
     logoPic.style.opacity = 1;
 }
 
-//function to move onto next suggestion Topic
+//function to move onto next auggestion Topic
 function showNextCard() {
 
     console.log("Showing the next card...");
     resetLogoPic(); // Reset the logoPic position for the next card
     logoPic.classList.remove('dismissing');
 }
-
-
-init();
 
 
 //this function toggles which panel is showing, and also clears data from all panels
@@ -139,8 +136,10 @@ function showPanel(panelId) {
         }
     }
 
-   
+
 }
+
+
 
 jQuery(function () {
     //when the app loads, show the logon panel to start with!
@@ -184,7 +183,6 @@ function logon() {
     var pass = document.getElementById("logonPass").value;
     var webMethod = "ProjectServices.asmx/LogOn";
     var parameters = "{\"uid\":\"" + encodeURI(id) + "\", \"pass\":\"" + encodeURI(pass) + "\"}";
-    var id = document.getElementById("logonID").value;
 
     $.ajax({
         type: "POST",
@@ -212,21 +210,12 @@ function logon() {
         },
         error: function (e) {
             alert("this code will only execute if javascript is unable to access the webservice");
-            
+            showPanel('accountsPanel'); //CHANGE WHEN DB IS UP
+
         }
     });
 }
 
-
-function updateUsernameDisplay() {
-    var storedUsername = localStorage.getItem('currentUser');
-    if (storedUsername) {
-        document.getElementById("usernameShow").textContent = storedUsername;
-    } else {
-        // Handle the case where there is no username stored, e.g., user not logged in
-        document.getElementById("usernameShow").textContent = "Not logged in";
-    }
-}
 function CreateAccount() {
     var id = document.getElementById("newId").value;
     var pass = document.getElementById("newPassword").value;
@@ -257,13 +246,13 @@ function leaderBoard() {
 
 function match() {
     showPanel('matchingPage');
-    
+
 
 }
 
 function viewTickets() {
     showPanel('manager');
-    
+
 }
 
 function suggestionInput() {
@@ -326,7 +315,7 @@ function LogOff() {
                 //stop checking messages
                 //and clear the chat panel
                 showPanel('logonPanel');
-                
+
             }
             else {
             }
@@ -411,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var submitButton = document.getElementById('submitFeedback');
     if (submitButton) {
         submitButton.addEventListener('click', function (event) {
-            event.preventDefault(); 
+            event.preventDefault();
 
             // Capture user inputs
             var userId = "5"; // This needs to be dynamically set based on the logged-in user
@@ -420,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var suggestionText = document.getElementById("feedbackValue").value;
 
 
-           
+
 
             // Construct the parameters string for the AJAX call
             var parameters = JSON.stringify({
@@ -453,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function () {
 //end of feedback js code
 
 
-//Displays the amount of tickets each user has when username input received
+
 function ticketManager() {
     var id = document.getElementById('userid').value;
     var webMethod = "ProjectServices.asmx/TotalTicketCount";
@@ -480,7 +469,7 @@ function ticketManager() {
     });
 }
 
-//Displays suggestion on matching page
+
 function LoadSuggestion() {
 
     $.ajax({
@@ -517,7 +506,6 @@ function LoadSuggestion() {
     });
 }
 
-//increments function for likes and dislikes
 function likeOrDislike(Suggestiontext, isLike) {
     var webMethod = "ProjectServices.asmx/LikenDislikeSuggestion";
     var parameters = {
@@ -532,14 +520,16 @@ function likeOrDislike(Suggestiontext, isLike) {
         dataType: "json",
         success: function (msg) {
 
-           
+
 
         },
         error: function (e) {
-           
+
         }
     });
 }
+
+
 
 
 
@@ -556,8 +546,8 @@ function deleteSuggestion(Suggestiontext) {
         dataType: "json",
         success: function (msg) {
             console.log("deleted...");
-            
-            
+
+
         },
         error: function (e) {
             alert("boo...");
