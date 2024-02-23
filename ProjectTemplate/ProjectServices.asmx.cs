@@ -1,9 +1,9 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Web;
 using System.Web.Services;
-using MySql.Data.MySqlClient;
-using System.Data;
 
 namespace ProjectTemplate
 {
@@ -17,15 +17,15 @@ namespace ProjectTemplate
         ////////////////////////////////////////////////////////////////////////
         ///replace the values of these variables with your database credentials
         ////////////////////////////////////////////////////////////////////////
-        private string dbID = "spring2024team4";
-        private string dbPass = "spring2024team4";
-        private string dbName = "spring2024team4";
+        private readonly string dbID = "spring2024team4";
+        private readonly string dbPass = "spring2024team4";
+        private readonly string dbName = "spring2024team4";
         ////////////////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////
         ///call this method anywhere that you need the connection string!
         ////////////////////////////////////////////////////////////////////////
-        private string getConString()
+        private string GetConString()
         {
             return "SERVER=107.180.1.16; PORT=3306; DATABASE=" + dbName + "; UID=" + dbID + "; PASSWORD=" + dbPass + "; CharSet=utf8mb4;";
         }
@@ -48,7 +48,7 @@ namespace ProjectTemplate
                 ////////////////////////////////////////////////////////////////////////
                 ///here's an example of using the getConString method!
                 ////////////////////////////////////////////////////////////////////////
-                MySqlConnection con = new MySqlConnection(getConString());
+                MySqlConnection con = new MySqlConnection(GetConString());
                 ////////////////////////////////////////////////////////////////////////
 
                 MySqlCommand cmd = new MySqlCommand(testQuery, con);
@@ -75,7 +75,7 @@ namespace ProjectTemplate
             bool success = false;
 
             //our connection string comes from our web.config file like we talked about earlier
-            string sqlConnectString = getConString();
+            string sqlConnectString = GetConString();
             //here's our query.  A basic select with nothing fancy.  Note the parameters that begin with @
             string sqlSelect = "SELECT id FROM Users WHERE userid=@idValue and pass=@passValue";
 
@@ -122,7 +122,7 @@ namespace ProjectTemplate
         [WebMethod(EnableSession = true)]
         public void RequestAccount(string uid, string pass)
         {
-            string sqlConnectString = getConString();
+            string sqlConnectString = GetConString();
             //the only thing fancy about this query is SELECT LAST_INSERT_ID() at the end.  All that
             //does is tell mySql server to return the primary key of the last inserted row.
             string sqlSelect = "insert into Users (userid, pass) " +
@@ -152,7 +152,7 @@ namespace ProjectTemplate
 
                 UpdateTotalTicketCount(uid, 0);
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             sqlConnection.Close();
@@ -173,7 +173,7 @@ namespace ProjectTemplate
                 string sqlUpdate = "UPDATE Users SET swipes = swipes + 1 WHERE userid = @userid";
                 string sqlUpdateSwipeDate = "UPDATE Users SET lastSwipeDate = CURDATE() WHERE userid = @userid";
 
-                using (MySqlConnection con = new MySqlConnection(getConString()))
+                using (MySqlConnection con = new MySqlConnection(GetConString()))
                 using (MySqlCommand cmdUpdateSwipeDate = new MySqlCommand(sqlUpdateSwipeDate, con))
 
                 {
@@ -220,7 +220,7 @@ namespace ProjectTemplate
                 // SQL SELECT
                 string sqlSelect = "SELECT swipes FROM Users WHERE userid = @userid";
 
-                using (MySqlConnection con = new MySqlConnection(getConString()))
+                using (MySqlConnection con = new MySqlConnection(GetConString()))
                 {
                     con.Open();
 
@@ -255,7 +255,7 @@ namespace ProjectTemplate
             try
             {
                 string sqlSelect = "SELECT swipes, lastSwipeDate FROM Users WHERE userid = @userid";
-                using (MySqlConnection con = new MySqlConnection(getConString()))
+                using (MySqlConnection con = new MySqlConnection(GetConString()))
                 {
                     con.Open();
                     using (MySqlCommand cmd = new MySqlCommand(sqlSelect, con))
@@ -301,7 +301,7 @@ namespace ProjectTemplate
             try
             {
                 string sqlUpdate = "UPDATE Users SET swipes = 0, lastSwipeDate = CURDATE() WHERE userid = @userid";
-                using (MySqlConnection con = new MySqlConnection(getConString()))
+                using (MySqlConnection con = new MySqlConnection(GetConString()))
                 {
                     con.Open();
                     using (MySqlCommand cmd = new MySqlCommand(sqlUpdate, con))
@@ -311,7 +311,7 @@ namespace ProjectTemplate
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // Handle exceptions (e.g., log the error)
             }
@@ -327,7 +327,7 @@ namespace ProjectTemplate
         public List<Topic> GetTopics()
         {
             List<Topic> topics = new List<Topic>();
-            string connectionString = getConString();
+            string connectionString = GetConString();
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -368,7 +368,7 @@ namespace ProjectTemplate
         public List<Question> GetQuestions(int topicId)
         {
             List<Question> questions = new List<Question>();
-            string connectionString = getConString();
+            string connectionString = GetConString();
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -417,7 +417,7 @@ namespace ProjectTemplate
         public int GetDailySuggestionCountByUser(string userid)
         {
             int suggestionCount = 0;
-            string sqlConnectString = getConString();
+            string sqlConnectString = GetConString();
             // SQL query to get the count and the date of the latest suggestion by a user
             string sqlSelect = @"
         SELECT COUNT(*), MAX(Timestamp) FROM UserSuggestions 
@@ -454,10 +454,7 @@ namespace ProjectTemplate
             }
             finally
             {
-                if (sqlConnection != null)
-                {
-                    sqlConnection.Close();
-                }
+                sqlConnection?.Close();
             }
             return suggestionCount;
         }
@@ -481,7 +478,7 @@ namespace ProjectTemplate
             }
             else
             {
-                string sqlConnectString = getConString();
+                string sqlConnectString = GetConString();
                 // SQL command to insert a new suggestion
                 string sqlInsert = @"
             INSERT INTO UserSuggestions (UserId, SuggestionName, SuggestionText, Timestamp, likes) 
@@ -513,10 +510,7 @@ namespace ProjectTemplate
                 }
                 finally
                 {
-                    if (sqlConnection != null)
-                    {
-                        sqlConnection.Close();
-                    }
+                    sqlConnection?.Close();
                 }
             }
         }
@@ -525,7 +519,7 @@ namespace ProjectTemplate
         public int GetSuggestionCountByUser(string userid)
         {
             int suggestionCount = 0;
-            string sqlConnectString = getConString();
+            string sqlConnectString = GetConString();
             // SQL query to count the number of suggestions made by a user
             string sqlSelect = "SELECT COUNT(*) FROM UserSuggestions WHERE UserId = (SELECT id FROM Users WHERE userid = @userid)";
 
@@ -553,10 +547,7 @@ namespace ProjectTemplate
             finally
             {
                 // Always close the connection when done
-                if (sqlConnection != null)
-                {
-                    sqlConnection.Close();
-                }
+                sqlConnection?.Close();
             }
             // Return the count of suggestions
             return suggestionCount;
@@ -568,7 +559,7 @@ namespace ProjectTemplate
         {
             //inserts new user information into table
             string sqlUpdate = "insert into Tickets (userid, tickets) values(@idValue, @ticketsValue); SELECT LAST_INSERT_ID();";
-            string sqlConnectString = getConString();
+            string sqlConnectString = GetConString();
 
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlUpdate, sqlConnection);
@@ -577,13 +568,13 @@ namespace ProjectTemplate
             sqlCommand.Parameters.AddWithValue("@ticketsValue", ticketCount);
 
             sqlConnection.Open();
-           
+
             try
             {
                 int accountID = Convert.ToInt32(sqlCommand.ExecuteScalar());
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             sqlConnection.Close();
@@ -596,7 +587,7 @@ namespace ProjectTemplate
         {
 
             int ticketCount = 0;
-            string sqlConnectString = getConString();
+            string sqlConnectString = GetConString();
 
             //Uses SELECT to look throught the tickets table to pull total tickets of user
             string sqlSelect = "SELECT tickets FROM Tickets WHERE userid = @userid";
@@ -610,7 +601,7 @@ namespace ProjectTemplate
                     try
                     {
                         sqlConnection.Open();
-                        
+
                         ticketCount = Convert.ToInt32(sqlCommand.ExecuteScalar());
                     }
                     catch (Exception e)
@@ -631,7 +622,7 @@ namespace ProjectTemplate
         public void SubmitSuggestion(string uid, int questionId, int topicId, string suggestionText)
         {
 
-            string sqlConnectString = getConString();
+            string sqlConnectString = GetConString();
 
             // parameterized SQL query 
 
@@ -659,7 +650,7 @@ namespace ProjectTemplate
         public Suggestions[] GetSuggestions()
         {
             DataTable sqlDt = new DataTable("Suggestions");
-            string connectionString = getConString();
+            string connectionString = GetConString();
 
             string sqlSelect = @"
                 SELECT t.TopicName, q.Question, s.Suggestiontext
@@ -691,7 +682,7 @@ namespace ProjectTemplate
         }
 
         //enables user to delete data from Suggestions table
-       
+
 
         public class Suggestions
         {
@@ -701,7 +692,7 @@ namespace ProjectTemplate
         }
         public int GetLikes(string userid)
         {
-            string sqlConnectString = getConString();
+            string sqlConnectString = GetConString();
             string sqlUpdate = "SELECT likes FROM Suggestions WHERE userid = @userid";
             int likesCount = 0;
 
@@ -715,7 +706,7 @@ namespace ProjectTemplate
                     {
                         sqlConnection.Open();
                         likesCount = Convert.ToInt32(sqlCommand.ExecuteScalar());
-                        
+
                     }
                     catch (Exception ex)
                     {
@@ -724,15 +715,16 @@ namespace ProjectTemplate
 
                     }
                 }
-            }return likesCount;
+            }
+            return likesCount;
         }
 
 
         [WebMethod(EnableSession = true)]
-        public void LikenDislikeSuggestion( string Suggestiontext, bool isLike) 
+        public void LikenDislikeSuggestion(string Suggestiontext, bool isLike)
         {
-            
-            string sqlConnectString = getConString();
+
+            string sqlConnectString = GetConString();
             string columnToUpdate = isLike ? "likes" : "dislikes";
             string sqlUpdate = $"UPDATE Suggestions SET {columnToUpdate} = {columnToUpdate} + 1 WHERE Suggestiontext = @SuggestiontextValue";
 
@@ -741,7 +733,7 @@ namespace ProjectTemplate
             {
                 using (MySqlCommand sqlCommand = new MySqlCommand(sqlUpdate, sqlConnection))
                 {
-                    
+
                     sqlCommand.Parameters.AddWithValue("@SuggestiontextValue", Suggestiontext);
 
                     try
@@ -768,7 +760,7 @@ namespace ProjectTemplate
             string sqlSelect = "SELECT dislikes FROM Suggestions WHERE Suggestiontext = @SuggestiontextValue";
             string sqlDelete = "DELETE FROM Suggestions WHERE Suggestiontext = @SuggestiontextValue";
 
-            using (MySqlConnection sqlConnection = new MySqlConnection(getConString()))
+            using (MySqlConnection sqlConnection = new MySqlConnection(GetConString()))
             {
                 sqlConnection.Open();
                 int dislikes = 0;
