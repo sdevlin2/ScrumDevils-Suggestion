@@ -754,13 +754,15 @@ namespace ProjectTemplate
                 }
             }
         }
+
+        [WebMethod(EnableSession = true)]
         public string LeaderboardSuggestions()
         {
             string sqlConnectString = GetConString();
 
             using (MySqlConnection connection = new MySqlConnection(sqlConnectString))
             {
-                string query = "SELECT suggestion, likes FROM Suggestions";
+                string query = "SELECT Suggestiontext, likes FROM Suggestions";
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
                     MySqlDataAdapter adapter = new MySqlDataAdapter(command);
@@ -771,6 +773,8 @@ namespace ProjectTemplate
             }
         }
 
+
+        [WebMethod(EnableSession = true)]
         private string ConvertDataTableToJson(DataTable table)
         {
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -788,6 +792,9 @@ namespace ProjectTemplate
             return serializer.Serialize(rows);
         }
 
+
+
+        [WebMethod(EnableSession = true)]
         private void CheckAndRemoveSuggestionIfDisliked(string Suggestiontext)
         {
             string sqlSelect = "SELECT dislikes FROM Suggestions WHERE Suggestiontext = @SuggestiontextValue";
