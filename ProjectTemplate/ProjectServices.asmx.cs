@@ -754,6 +754,39 @@ namespace ProjectTemplate
                 }
             }
         }
+        public string LeaderboardSuggestions()
+        {
+            string sqlConnectString = GetConString();
+
+            using (MySqlConnection connection = new MySqlConnection(sqlConnectString))
+            {
+                string query = "SELECT suggestion, likes FROM Suggestions";
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    MySqlDataAdapter adapter = new MySqlDataAdapter(command);
+                    DataTable table = new DataTable();
+                    adapter.Fill(table);
+                    return ConvertDataTableToJson(table);
+                }
+            }
+        }
+
+        private string ConvertDataTableToJson(DataTable table)
+        {
+            System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+            Dictionary<string, object> row;
+            foreach (DataRow dr in table.Rows)
+            {
+                row = new Dictionary<string, object>();
+                foreach (DataColumn col in table.Columns)
+                {
+                    row.Add(col.ColumnName, dr[col]);
+                }
+                rows.Add(row);
+            }
+            return serializer.Serialize(rows);
+        }
 
         private void CheckAndRemoveSuggestionIfDisliked(string Suggestiontext)
         {

@@ -522,7 +522,39 @@ function LoadSuggestion() {
         }
     });
 }
+function fetchLeaderboardData() {
+    $.ajax({
+        url: 'ProjectServices.asmx/LeaderboardSuggestions',
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function (msg) {
 
+            displayLeaderboard(msg.d);
+
+        },
+        error: function (xhr, status, e) {
+
+            console.error('Error fetching leaderboard data:', e);
+        }
+    });
+}
+
+$(document).ready(function () {
+    fetchLeaderboardData();
+});
+
+function displayLeaderboard(data) {
+
+    $('#leaderboard').empty();
+
+    data.sort((a, b) => b.likes - a.likes);
+
+    data.forEach((item, index) => {
+        $('#leaderboard').append(`<div>${index + 1}. ${item.suggestion} - Likes: ${item.likes}</div>`)
+    });
+
+}
 function likeOrDislike(Suggestiontext, isLike) {
     var webMethod = "ProjectServices.asmx/LikenDislikeSuggestion";
     var parameters = {
