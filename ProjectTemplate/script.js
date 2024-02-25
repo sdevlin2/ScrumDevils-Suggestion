@@ -554,20 +554,49 @@ function fetchLeaderboardData() {
 
 function displayLeaderboard(data) {
 
-    
-    $('#leaderboardList').empty();
-    data.split(",");
-    console.log(typeof data);
+    // Parse the JSON data if it's a string
+    var leaderboardData = typeof data === 'string' ? JSON.parse(data) : data;
 
+    // Sort the data based on likes in descending order
+    leaderboardData.sort((a, b) => b.likes - a.likes);
+
+    // Start building the table HTML
+    var tableHtml = '<table class="leaderboard-table">';
+    tableHtml += '<tr><th>Suggestion</th><th>Likes</th></tr>';
+
+    // Add rows to the table for each suggestion
+    for (var i = 0; i < leaderboardData.length; i++) {
+        tableHtml += '<tr>';
+        tableHtml += '<td>' + leaderboardData[i].Suggestiontext + '</td>';
+        tableHtml += '<td>' + leaderboardData[i].likes + '</td>';
+        tableHtml += '</tr>';
+    }
+
+    // Close the table HTML
+    tableHtml += '</table>';
+
+    // Set the innerHTML of the leaderboardList element
+    document.getElementById('leaderboardList').innerHTML = tableHtml;
+
+    /*
+    $('#leaderboardList').empty();
+    var dataArray = data.split('},{"Suggestiontext":"');
+    dataArray.sort()
+    console.log(typeof dataArray);
+    console.log(dataArray[1]);
     //data.sort((a, b) => b.likes - a.likes);
     //console.log(Array.isArray(arrayData));
-    $('#leaderboardList').append(data);
+    for (let i = 0; i < dataArray.length; i++) {
+        var j = i + 1;
+        $('#leaderboardList').append(""+j+": "+dataArray[i]);
+    }
+        
     //document.getElementById("leaderboardList").innerHTML = JSON.stringify(data)
     //data.forEach((item, index) => {
     //$('#leaderboardList').append(data);
     
       //$('#leaderboardList').append(`<div>${data.Suggestiontext} - Likes: ${data.likes}</div>`)
-    //});
+    //});*/
 
 }
 function likeOrDislike(Suggestiontext, isLike) {

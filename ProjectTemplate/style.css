@@ -258,3 +258,25 @@ body {
     right: 30px; /* Moved slightly more to the right for better positioning */
     color: white; /* Make the text white */
 }
+
+.leaderboard-table{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .leaderboard-table th {
+        background-color: #f4f4f4;
+        color: #333;
+    }
+
+    .leaderboard-table tr:nth-child(even){
+        background-color: #f9f9f9;
+    }

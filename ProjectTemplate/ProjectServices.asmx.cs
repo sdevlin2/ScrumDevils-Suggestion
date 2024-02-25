@@ -786,6 +786,8 @@ namespace ProjectTemplate
 
 
         [WebMethod(EnableSession = true)]
+
+        
         private string ConvertDataTableToJson(DataTable table)
         {
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
