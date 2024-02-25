@@ -45,7 +45,7 @@
 
                 <span id="accountInfo">
                     <h2 id="accountName">User: <span id="usernameShow"></span></h2>
-                    <h2 id="pointCounter">Points: <span id='pointsTotal'>0</span></h2>
+                    <!--<h2 id="pointCounter">Points: <span id='pointsTotal'>0</span></h2>-->
                 </span>
                 <img src="logo-color.jpg" alt="User Profile">
 
@@ -83,9 +83,9 @@
 
 
                 <button id="nope" class="button-swipe" onclick="handleSwipe(false)">&lArr; Skip</button>
-                <button id="like" class="button-swipe" onclick="pointCounter(), handleSwipe(true)">&rArr; Agree</button>
+                <button id="like" class="button-swipe" onclick="handleSwipe(true)">&rArr; Agree</button>
 
-                <a href="#" onclick="goBack()">Go Back</a>
+                <button id="leaderboardGoBack" onclick="goBack()">Go Back</button>
             </div>
             <div id="suggestionPage">
                 <h1>Make a suggestion</h1>

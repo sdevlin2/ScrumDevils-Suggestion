@@ -703,21 +703,24 @@ namespace ProjectTemplate
         {
             string sqlConnectString = GetConString();
             
-            string sqlUpdate = "SELECT SUM(Suggestions.likes) FROM Users LEFT JOIN Suggestions ON Users.id = Suggestions.userid WHERE userid = "+userid+"GROUP BY Users.userid, Users.userid;";
+            string sqlUpdate = "SELECT SUM(s.likes) AS TotalLikes FROM Users u LEFT JOIN Suggestions s ON u.id = s.userid WHERE u.id = @userid;";
             int likesCount = 0;
 
             using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
             {
                 using (MySqlCommand sqlCommand = new MySqlCommand(sqlUpdate, sqlConnection))
                 {
-                    Console.WriteLine(sqlCommand.CommandText);
                     sqlCommand.Parameters.AddWithValue("@userid", userid);
 
                     try
                     {
                         sqlConnection.Open();
-                        likesCount = Convert.ToInt32(sqlCommand.ExecuteScalar());
-                        Console.WriteLine(likesCount);
+                        var result = sqlCommand.ExecuteScalar();
+                        if (result != DBNull.Value)
+                        {
+                            likesCount = Convert.ToInt32(result);
+                        }
+                        Console.WriteLine(result);
                     }
                     catch (Exception ex)
                     {

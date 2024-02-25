@@ -245,15 +245,24 @@ body {
     display: none;
 }
 
+#leaderboardGoBack {
+    width: 100%;
+    padding: 15px;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
 #accountName {
-    position: fixed;
+    position: absolute;
     top: 20px;
     left: 100px; /* Moved slightly more to the right for better alignment */
     color: white; /* Make the text white */
 }
 
 #pointCounter {
-    position: fixed;
+    position: absolute;
     top: 20px;
     right: 30px; /* Moved slightly more to the right for better positioning */
     color: white; /* Make the text white */

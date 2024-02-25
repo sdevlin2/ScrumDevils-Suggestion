@@ -275,13 +275,9 @@ function suggestionInput() {
     //showPanel('suggestionPage');
 }
 
-function userNumber(userid) {
+function pointCounter(userid) {
 
-
-
-}
-function pointCounter() {
-
+    
 
     $.ajax({
         url: "ProjectServices.asmx/GetLikes",
@@ -294,7 +290,9 @@ function pointCounter() {
             document.getElementById('numberCounter').innerHTML = points;
         },
         error: function (xhr, status, error) {
+            console.log(userid);
             console.error("Error fetching points:", error);
+            
         }
     });
     /*pointTotal++;
