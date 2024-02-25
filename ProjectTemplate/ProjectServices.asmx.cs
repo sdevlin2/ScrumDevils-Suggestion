@@ -691,18 +691,18 @@ namespace ProjectTemplate
             public string SuggestionText { get; set; }
         }
 
-       // public int GetUserIDNumber(string userID)
+        // public int GetUserIDNumber(string userID)
         //{
 
 
         //}
 
-            
+
 
         public int GetLikes(string userid)
         {
             string sqlConnectString = GetConString();
-            
+
             string sqlUpdate = "SELECT SUM(s.likes) AS TotalLikes FROM Users u LEFT JOIN Suggestions s ON u.id = s.userid WHERE u.id = @userid;";
             int likesCount = 0;
 
@@ -790,7 +790,7 @@ namespace ProjectTemplate
 
         [WebMethod(EnableSession = true)]
 
-        
+
         private string ConvertDataTableToJson(DataTable table)
         {
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
