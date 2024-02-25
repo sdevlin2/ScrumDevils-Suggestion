@@ -690,23 +690,34 @@ namespace ProjectTemplate
             public string QuestionId { get; set; }
             public string SuggestionText { get; set; }
         }
+
+       // public int GetUserIDNumber(string userID)
+        //{
+
+
+        //}
+
+            
+
         public int GetLikes(string userid)
         {
             string sqlConnectString = GetConString();
-            string sqlUpdate = "SELECT likes FROM Suggestions WHERE userid = @userid";
+            
+            string sqlUpdate = "SELECT SUM(Suggestions.likes) FROM Users LEFT JOIN Suggestions ON Users.id = Suggestions.userid WHERE userid = "+userid+"GROUP BY Users.userid, Users.userid;";
             int likesCount = 0;
 
             using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
             {
                 using (MySqlCommand sqlCommand = new MySqlCommand(sqlUpdate, sqlConnection))
                 {
-                    sqlCommand.Parameters.AddWithValue("@userid", HttpUtility.UrlDecode(userid));
+                    Console.WriteLine(sqlCommand.CommandText);
+                    sqlCommand.Parameters.AddWithValue("@userid", userid);
 
                     try
                     {
                         sqlConnection.Open();
                         likesCount = Convert.ToInt32(sqlCommand.ExecuteScalar());
-
+                        Console.WriteLine(likesCount);
                     }
                     catch (Exception ex)
                     {

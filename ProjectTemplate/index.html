@@ -51,7 +51,7 @@
 
 
 
-                <button onclick="leaderBoard()" id="lbButton">Leaderboard</button>
+                <button onclick="leaderBoard(), fetchLeaderboardData()" id="lbButton">Leaderboard</button>
                 <button onclick="match()" id="mButton">Matching</button>
                 <button onclick="suggestionInput()" id="sButton">Suggestions</button>
 
@@ -66,9 +66,9 @@
 
 
         <div class="mainPage">
-            <div id="leaderBoardPage" onload="fetchLeaderboardDate()">
+            <div id="leaderBoardPage">
                 <h1>Leader Board</h1>
-                <p></p>
+                <p id="leaderboardList"></p>
                 <a href="#" onclick="goBack()">Go Back</a>
             </div>
             <div id="matchingPage" class="content">
@@ -83,7 +83,7 @@
 
 
                 <button id="nope" class="button-swipe" onclick="handleSwipe(false)">&lArr; Skip</button>
-                <button id="like" class="button-swipe" onclick="handleSwipe(true)">&rArr; Agree</button>
+                <button id="like" class="button-swipe" onclick="pointCounter(), handleSwipe(true)">&rArr; Agree</button>
 
                 <a href="#" onclick="goBack()">Go Back</a>
             </div>

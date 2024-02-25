@@ -275,7 +275,13 @@ function suggestionInput() {
     //showPanel('suggestionPage');
 }
 
-function pointCounter(userid) {
+function userNumber(userid) {
+
+
+
+}
+function pointCounter() {
+
 
     $.ajax({
         url: "ProjectServices.asmx/GetLikes",
@@ -283,8 +289,8 @@ function pointCounter(userid) {
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         data: JSON.stringify({ userid: userid }),
-        success: function (response) {
-            var points = parseInt(response.d);
+        success: function (msg) {
+            var points = parseInt(msg.d);
             document.getElementById('numberCounter').innerHTML = points;
         },
         error: function (xhr, status, error) {
@@ -523,36 +529,45 @@ function LoadSuggestion() {
     });
 }
 function fetchLeaderboardData() {
+    
     $.ajax({
+        
         url: 'ProjectServices.asmx/LeaderboardSuggestions',
         type: 'POST',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (msg) {
-
+            console.log("hello")
             displayLeaderboard(msg.d);
 
         },
         error: function (xhr, status, e) {
-
+            ;
             console.error('Error fetching leaderboard data:', e);
         }
     });
 }
 
-$(document).ready(function () {
+/*$(document).ready(function () {
     fetchLeaderboardData();
-});
+});*/
 
 function displayLeaderboard(data) {
 
-    $('#leaderboard').empty();
+    
+    $('#leaderboardList').empty();
+    data.split(",");
+    console.log(typeof data);
 
-    data.sort((a, b) => b.likes - a.likes);
-
-    data.forEach((item, index) => {
-        $('#leaderboard').append(`<div>${index + 1}. ${item.suggestion} - Likes: ${item.likes}</div>`)
-    });
+    //data.sort((a, b) => b.likes - a.likes);
+    //console.log(Array.isArray(arrayData));
+    $('#leaderboardList').append(data);
+    //document.getElementById("leaderboardList").innerHTML = JSON.stringify(data)
+    //data.forEach((item, index) => {
+    //$('#leaderboardList').append(data);
+    
+      //$('#leaderboardList').append(`<div>${data.Suggestiontext} - Likes: ${data.likes}</div>`)
+    //});
 
 }
 function likeOrDislike(Suggestiontext, isLike) {
